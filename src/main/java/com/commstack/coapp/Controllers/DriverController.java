@@ -2,6 +2,10 @@ package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.Driver;
 import com.commstack.coapp.Service.DriverService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +15,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/drivers")
 @CrossOrigin(origins = "*")
+@SecurityRequirement(name = "Bearer Authentication")
+@RequiredArgsConstructor
 public class DriverController {
 
-    @Autowired
-    private DriverService service;
+    private final DriverService service;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerDriver(@RequestBody Driver driver, Principal principal) {

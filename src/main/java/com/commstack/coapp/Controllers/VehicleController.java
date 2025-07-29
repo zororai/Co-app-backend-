@@ -2,6 +2,10 @@ package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.Vehicle;
 import com.commstack.coapp.Service.VehicleService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,11 +14,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/vehicles")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@SecurityRequirement(name = "Bearer Authentication")
+@RequiredArgsConstructor
 public class VehicleController {
 
-    @Autowired
-    private VehicleService service;
+    private final VehicleService service;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerVehicle(@RequestBody Vehicle vehicle, Principal principal) {

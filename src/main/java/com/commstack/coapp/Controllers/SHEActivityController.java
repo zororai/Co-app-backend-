@@ -2,6 +2,10 @@ package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.SHEActivity;
 import com.commstack.coapp.Service.SHEActivityService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +16,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/she-activities")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@SecurityRequirement(name = "Bearer Authentication")
+@RequiredArgsConstructor
 public class SHEActivityController {
 
-    @Autowired
-    private SHEActivityService service;
+    private final SHEActivityService service;
 
     @PostMapping
     public ResponseEntity<String> createActivity(@RequestBody SHEActivity activity, Principal principal) {

@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://comm-invoice-portal.vercel.app/")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AuthenticationController {
     @Autowired
     private UserServiceResetImpl userServiceResetImpl;

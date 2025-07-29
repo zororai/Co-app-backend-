@@ -3,6 +3,8 @@ package com.commstack.coapp.Controllers;
 import com.commstack.coapp.Models.UserOnboarding;
 import com.commstack.coapp.Service.UserOnboardingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +13,12 @@ import java.util.List;
 
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://comm-invoice-portal.vercel.app/")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserOnboardingController {
 
-    @Autowired
-    private UserOnboardingService service;
+    private final UserOnboardingService service;
 
     @PostMapping("/create")
     public ResponseEntity<UserOnboarding> create(@RequestBody UserOnboarding user, Principal principal) {

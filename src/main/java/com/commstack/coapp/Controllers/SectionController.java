@@ -3,6 +3,8 @@ package com.commstack.coapp.Controllers;
 import com.commstack.coapp.Models.Section;
 import com.commstack.coapp.Service.SectionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +13,12 @@ import java.util.List;
 
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://comm-invoice-portal.vercel.app/")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RequiredArgsConstructor
 @RequestMapping("/api/sections")
 public class SectionController {
 
-    @Autowired
-    private SectionService service;
+    private final SectionService service;
 
     @PostMapping("/create")
     public ResponseEntity<String> createSection(@RequestBody Section section, Principal principal) {

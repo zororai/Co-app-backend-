@@ -2,6 +2,10 @@ package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.SecurityCompany;
 import com.commstack.coapp.Service.SecurityCompanyService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,11 +14,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/security-companies")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@SecurityRequirement(name = "Bearer Authentication")
+@RequiredArgsConstructor
 public class SecurityCompanyController {
 
-    @Autowired
-    private SecurityCompanyService service;
+    private final SecurityCompanyService service;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerCompany(@RequestBody SecurityCompany company, Principal principal) {

@@ -4,6 +4,7 @@ import com.commstack.coapp.Models.Regminer;
 import com.commstack.coapp.Service.RegMinerService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,12 @@ import java.util.List;
 
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://comm-invoice-portal.vercel.app/")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RequiredArgsConstructor
 @RequestMapping("/api/miners")
 public class RegMinerController {
 
-    @Autowired
-    private RegMinerService service;
+    private final RegMinerService service;
 
     @PostMapping("/createminers")
     public ResponseEntity<Regminer> create(@RequestBody Regminer miner, Principal principal) {

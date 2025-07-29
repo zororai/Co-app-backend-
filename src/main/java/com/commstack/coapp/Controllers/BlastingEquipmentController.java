@@ -2,6 +2,10 @@ package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.BlastingEquipment;
 import com.commstack.coapp.Service.BlastingEquipmentService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +16,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/blasting-equipment")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@SecurityRequirement(name = "Bearer Authentication")
+@RequiredArgsConstructor
 public class BlastingEquipmentController {
 
-    @Autowired
-    private BlastingEquipmentService service;
+    private final BlastingEquipmentService service;
 
     @PostMapping
     public ResponseEntity<String> createEquipment(@RequestBody BlastingEquipment equipment, Principal principal) {
