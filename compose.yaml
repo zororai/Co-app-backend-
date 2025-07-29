@@ -1,0 +1,63 @@
+version: '3.3'
+
+services:
+
+  mongodb2:
+    image: mongo:latest
+    container_name: mongodb2
+
+    profiles:
+      - dev
+
+    volumes:
+      - mongodb-data:/data/db
+      - ./db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+
+    environment:
+      MONGO_INITDB_DATABASE: coapp
+      MONGO_INITDB_ROOT_PASSWORD: commstackcoapp123
+      MONGO_INITDB_ROOT_USERNAME: admin
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: "exit 0"
+    networks:
+      - shared-net
+
+  coapp-app-dev:
+    container_name: coapp-app-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "1000:8080"
+    depends_on:
+      mongodb2:
+        condition: service_healthy
+
+    links:
+      - mongodb2
+
+    volumes:
+      - ./db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+    environment:
+      WAIT_HOSTS: mongodb2:27017
+
+      SPRING_DATA_MONGODB_HOST: mongodb2
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
+      SPRING_DATA_MONGODB_DATABASE: coapp
+      SPRING_DATA_MONGODB_USERNAME: admin
+      SPRING_DATA_MONGODB_PASSWORD: commstackcoapp123
+
+    profiles:
+      - dev
+    networks:
+      - shared-net
+
+volumes:
+  mongodb-data:
+
+networks:
+  shared-net:
+    driver: bridge
