@@ -23,10 +23,18 @@ public class CompanyRegistrationServiceImpl implements CompanyRegistrationServic
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    private String generateRegistrationNumber() {
+        String datePart = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
+        int randomPart = (int) (Math.random() * 9000) + 1000;
+        return "mines-" + datePart + "-" + randomPart;
+    }
+
     @Override
     public ResponseEntity<String> create(CompanyRegistration company, Principal principal) {
         company.setCreatedBy(principal.getName());
         company.setCreatedAt(LocalDate.now());
+        company.setShaftnumber(0);
+        company.setRegistrationNumber(generateRegistrationNumber());
         company.setUpdatedBy(principal.getName());
         company.setUpdatedAt(LocalDate.now());
         company.setStatus("PENDING");

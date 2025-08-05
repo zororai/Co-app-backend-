@@ -20,6 +20,7 @@ public class CompanyRegistration {
     private String address;
     private String cellNumber;
     private String email;
+    private String registrationNumber;
     private String companyLogo;
     private int shaftnumber;
     private String certificateOfCooperation;
