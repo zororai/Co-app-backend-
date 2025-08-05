@@ -1,0 +1,17 @@
+package com.commstack.coapp.Service;
+
+import com.commstack.coapp.Models.ShaftAssignment;
+import java.util.List;
+import java.security.Principal;
+
+public interface ShaftAssignmentService {
+    ShaftAssignment create(ShaftAssignment shaftAssignment, Principal principal);
+
+    ShaftAssignment getById(String id);
+
+    List<ShaftAssignment> getAll();
+
+    ShaftAssignment update(String id, ShaftAssignment shaftAssignment, Principal principal);
+
+    void delete(String id, Principal principal);
+}

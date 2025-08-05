@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Regminer {
     @Id
-    private String id; // MongoDB will generate this if not provided
+    private String id;
 
     private String name;
     private String surname;
