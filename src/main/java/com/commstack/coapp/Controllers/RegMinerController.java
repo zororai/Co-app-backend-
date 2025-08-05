@@ -69,23 +69,23 @@ public class RegMinerController {
     }
 
     @GetMapping("/getapproved")
-    public ResponseEntity<String> getAllApprovedMiners() {
+    public List<Regminer> getAllApprovedMiners() {
         return service.getallApprovedMiners();
     }
 
     @GetMapping("/getrejected")
-    public ResponseEntity<String> getAllRejectedMiners() {
+    public List<Regminer> getAllRejectedMiners() {
         return service.getallRejectedMiners();
     }
 
     @GetMapping("/getpushedback")
-    public ResponseEntity<String> getAllPushedBackMiners() {
+    public List<Regminer> getAllPushedBackMiners() {
         return service.getallPushedBackMiners();
     }
 
     @GetMapping("/getpending")
-    public ResponseEntity<String> getAllPendingMiners() {
-        return service.getallPendingMiners();
+    public List<Regminer> getAllPendingMiners() {
+        return (List<Regminer>) service.getallPendingMiners();
     }
 
     @GetMapping("/getall")

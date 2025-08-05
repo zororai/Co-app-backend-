@@ -21,6 +21,7 @@ public class CompanyRegistration {
     private String cellNumber;
     private String email;
     private String companyLogo;
+    private int shaftnumber;
     private String certificateOfCooperation;
     private String cr14Copy;
     private String miningCertificate;

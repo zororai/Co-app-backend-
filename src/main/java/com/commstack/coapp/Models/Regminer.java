@@ -28,6 +28,7 @@ public class Regminer {
     private String nationIdNumber;
     private String address;
     private String cellNumber;
+    private int shaftnumber;
     private String email;
     private String status;
     private String reason;

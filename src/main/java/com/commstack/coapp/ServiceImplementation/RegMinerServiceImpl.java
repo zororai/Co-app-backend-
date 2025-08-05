@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.Regminer;
@@ -17,6 +18,11 @@ import java.util.Optional;
 
 @Service
 public class RegMinerServiceImpl implements RegMinerService {
+    private String generateRegistrationNumber() {
+        String datePart = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
+        int randomPart = (int) (Math.random() * 9000) + 1000;
+        return "REG-" + datePart + "-" + randomPart;
+    }
 
     @Autowired
     private RegMinerRepository repository;
@@ -28,6 +34,8 @@ public class RegMinerServiceImpl implements RegMinerService {
         // Set creation metadata
         miner.setCreatedby(principal.getName());
         miner.setCreatedAt(LocalDate.now());
+        miner.setShaftnumber(0);
+        miner.setRegistrationNumber(generateRegistrationNumber());
         miner.setUpdatedby(principal.getName());
         miner.setUpdatedAt(LocalDate.now());
         miner.setStatus("PENDING");
@@ -157,32 +165,36 @@ public class RegMinerServiceImpl implements RegMinerService {
         return ResponseEntity.status(404).body("Miner not found");
     }
 
-    public ResponseEntity<String> getallApprovedMiners() {
+    @Override
+    public List<Regminer> getallApprovedMiners() {
         List<Regminer> approvedMiners = repository.findAll().stream()
                 .filter(miner -> "APPROVED".equals(miner.getStatus()))
                 .toList();
-        return ResponseEntity.ok(approvedMiners.toString());
+        return approvedMiners;
     }
 
-    public ResponseEntity<String> getallRejectedMiners() {
+    @Override
+    public List<Regminer> getallRejectedMiners() {
         List<Regminer> rejectedMiners = repository.findAll().stream()
                 .filter(miner -> "REJECTED".equals(miner.getStatus()))
                 .toList();
-        return ResponseEntity.ok(rejectedMiners.toString());
+        return rejectedMiners;
     }
 
-    public ResponseEntity<String> getallPushedBackMiners() {
+    @Override
+    public List<Regminer> getallPushedBackMiners() {
         List<Regminer> pushedBackMiners = repository.findAll().stream()
                 .filter(miner -> "PUSHED_BACK".equals(miner.getStatus()))
                 .toList();
-        return ResponseEntity.ok(pushedBackMiners.toString());
+        return pushedBackMiners;
     }
 
-    public ResponseEntity<String> getallPendingMiners() {
+    @Override
+    public List<Regminer> getallPendingMiners() {
         List<Regminer> pendingMiners = repository.findAll().stream()
                 .filter(miner -> "PENDING".equals(miner.getStatus()))
                 .toList();
-        return ResponseEntity.ok(pendingMiners.toString());
+        return pendingMiners;
     }
 
     @Override

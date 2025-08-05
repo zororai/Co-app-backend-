@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")

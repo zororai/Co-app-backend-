@@ -43,7 +43,7 @@ public class CompanyRegistrationServiceImpl implements CompanyRegistrationServic
                 .build();
         mongoTemplate.save(audit, "company_audit_trail");
 
-        return ResponseEntity.ok("Company registered successfully");
+        return ResponseEntity.status(200).body("Company registered successfully");
     }
 
     @Override

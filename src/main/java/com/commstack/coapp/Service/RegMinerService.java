@@ -14,6 +14,14 @@ public interface RegMinerService {
 
     Regminer getById(String id);
 
+    List<Regminer> getallApprovedMiners();
+
+    List<Regminer> getallRejectedMiners();
+
+    List<Regminer> getallPushedBackMiners();
+
+    List<Regminer> getallPendingMiners();
+
     ResponseEntity<String> update(String id, Regminer miner, Principal principal);
 
     ResponseEntity<String> delete(String id, Principal principal);
@@ -22,14 +30,8 @@ public interface RegMinerService {
 
     ResponseEntity<String> pushBack(String id, String reason, Principal principal);
 
-    ResponseEntity<String> getallApprovedMiners();
-
     ResponseEntity<String> reject(String id, String reason, Principal principal);
 
-    ResponseEntity<String> getallRejectedMiners();
-
-    ResponseEntity<String> getallPushedBackMiners();
-
-    ResponseEntity<String> getallPendingMiners();
+    ;
 
 }
