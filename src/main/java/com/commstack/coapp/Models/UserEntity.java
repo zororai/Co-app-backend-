@@ -32,7 +32,7 @@ public class UserEntity implements UserDetails {
     String email;
     String password;
     String token;
-    // private List<Roles> role;
+    // private List <Roles> role;
     String createdBy;
     String userUpdatedBy;
     private LocalDateTime userUpdatedAt;

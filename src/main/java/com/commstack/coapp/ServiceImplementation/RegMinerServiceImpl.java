@@ -21,7 +21,7 @@ public class RegMinerServiceImpl implements RegMinerService {
     private String generateRegistrationNumber() {
         String datePart = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
         int randomPart = (int) (Math.random() * 9000) + 1000;
-        return "REG-" + datePart + "-" + randomPart;
+        return "MS-" + datePart + "-" + randomPart;
     }
 
     @Autowired
@@ -227,7 +227,7 @@ public class RegMinerServiceImpl implements RegMinerService {
             existingMiner.setStatus(miner.getStatus());
             existingMiner.setReason(miner.getReason());
             existingMiner.setRegistrationNumber(miner.getRegistrationNumber());
-            existingMiner.setCooperativeDetails(miner.getCooperativeDetails());
+            existingMiner.setCooperativename(miner.getCooperativename());
             existingMiner.setPosition(miner.getPosition());
             existingMiner.setIdPicture(miner.getIdPicture());
             existingMiner.setTeamMembers(miner.getTeamMembers());

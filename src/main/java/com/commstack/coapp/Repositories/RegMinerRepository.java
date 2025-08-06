@@ -8,5 +8,4 @@ import com.commstack.coapp.Models.Regminer;
 public interface RegMinerRepository extends MongoRepository<Regminer, String> {
     Optional<Regminer> findById(String id);
 
-    Optional<Regminer> findByStatus(String status);
 }

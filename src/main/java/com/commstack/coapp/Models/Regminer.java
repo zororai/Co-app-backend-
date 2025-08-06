@@ -34,7 +34,7 @@ public class Regminer {
     private String reason;
     private String registrationNumber;
     private LocalDate registrationDate;
-    private List<CooperativeDetails> cooperativeDetails;
+    private String cooperativename;
     private String position;
     private String idPicture;
     private List<TeamMember> teamMembers;

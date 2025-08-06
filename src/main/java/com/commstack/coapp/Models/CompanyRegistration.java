@@ -43,4 +43,5 @@ public class CompanyRegistration {
     private LocalDate createdAt;
     private String updatedBy;
     private LocalDate updatedAt;
+
 }

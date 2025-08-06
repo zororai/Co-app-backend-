@@ -3,9 +3,9 @@ package com.commstack.coapp.Controllers;
 import com.commstack.coapp.Models.ShaftAssignment;
 import com.commstack.coapp.Service.ShaftAssignmentService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +13,12 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
-@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "Bearer Authentication")
 @RequestMapping("/api/shaft-assignments")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class ShaftAssignmentController {
+
     private final ShaftAssignmentService shaftAssignmentService;
 
     @PostMapping
@@ -37,7 +38,8 @@ public class ShaftAssignmentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ShaftAssignment> update(@PathVariable String id, @RequestBody ShaftAssignment shaftAssignment,
+    public ResponseEntity<ShaftAssignment> update(@PathVariable String id,
+            @RequestBody ShaftAssignment shaftAssignment,
             Principal principal) {
         ShaftAssignment updated = shaftAssignmentService.update(id, shaftAssignment, principal);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
@@ -50,7 +52,8 @@ public class ShaftAssignmentController {
     }
 
     @PostMapping("/{id}/pushback")
-    public ResponseEntity<ShaftAssignment> pushBack(@PathVariable String id, @RequestParam String reason,
+    public ResponseEntity<ShaftAssignment> pushBack(@PathVariable String id,
+            @RequestParam String reason,
             Principal principal) {
         ShaftAssignment updated = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
                 .pushBack(id, reason, principal);
