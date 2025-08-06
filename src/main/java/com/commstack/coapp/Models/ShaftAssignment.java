@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class ShaftAssignment {
     @Id
     private String id;
-    private Long minerId;
+    private String minerId;
     private String sectionName;
     private String shaftNumbers;
     private BigDecimal medicalFee;
