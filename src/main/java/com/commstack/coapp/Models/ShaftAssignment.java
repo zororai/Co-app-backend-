@@ -23,6 +23,7 @@ public class ShaftAssignment {
     private String shaftNumbers;
     private BigDecimal medicalFee;
     private BigDecimal regFee;
+    private int shaftNumber;
     private LocalDate startContractDate;
     private LocalDate endContractDate;
     private String status;
