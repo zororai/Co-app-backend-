@@ -17,7 +17,7 @@ public class Section {
     @Id
     private String id;
     private String sectionName;
-    private String numberOfShaft;
+    private int numberOfShaft;
 
     // Status tracking
     private String status;

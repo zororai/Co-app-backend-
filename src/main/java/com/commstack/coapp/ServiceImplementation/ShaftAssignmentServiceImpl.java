@@ -1,5 +1,7 @@
-
 package com.commstack.coapp.ServiceImplementation;
+
+import com.commstack.coapp.Repositories.SectionRepository;
+import com.commstack.coapp.Models.Section;
 
 import com.commstack.coapp.Repositories.CompanyRegistrationRepository;
 import com.commstack.coapp.Repositories.RegMinerRepository;
@@ -20,6 +22,8 @@ import java.util.Optional;
 
 @Service
 public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
+    @Autowired
+    private SectionRepository sectionRepository;
 
     public ShaftAssignment pushBack(String id, String reason, Principal principal) {
         Optional<ShaftAssignment> result = repository.findById(id);
@@ -77,6 +81,21 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
 
     @Override
     public ShaftAssignment create(ShaftAssignment shaftAssignment, Principal principal) {
+        // Check if creating this shaft exceeds the allowed number in Section
+        if (shaftAssignment.getSectionName() != null && shaftAssignment.getMinerId() != null) {
+            Section section = sectionRepository.findBySectionNameAndMinerId(
+                    shaftAssignment.getSectionName(), String.valueOf(shaftAssignment.getMinerId()));
+            if (section != null) {
+                int allowed = section.getNumberOfShaft();
+                long currentCount = repository.findAll().stream()
+                        .filter(s -> shaftAssignment.getSectionName().equals(s.getSectionName()) &&
+                                shaftAssignment.getMinerId().equals(s.getMinerId()))
+                        .count();
+                if (currentCount >= allowed) {
+                    throw new IllegalStateException("Cannot create more shafts than allowed in section");
+                }
+            }
+        }
         shaftAssignment.setCreatedBy(principal.getName());
         shaftAssignment.setCreatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setUpdatedBy(principal.getName());
