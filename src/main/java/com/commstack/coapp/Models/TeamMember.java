@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 public class TeamMember {
     private String name;
     private String surname;
-    private String position;
-    private String nationIdNumber;
-    private String contactNumber;
-    private String email;
+    private String idNumber;
+    private String address;
 }

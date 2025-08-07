@@ -32,6 +32,13 @@ public class ShaftAssignmentController {
         return assignment != null ? ResponseEntity.ok(assignment) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/by-miner/{minerId}")
+    public ResponseEntity<List<ShaftAssignment>> getByMinerId(@PathVariable String minerId) {
+        List<ShaftAssignment> assignments = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .getByMinerId(minerId);
+        return ResponseEntity.ok(assignments);
+    }
+
     @GetMapping
     public ResponseEntity<List<ShaftAssignment>> getAll() {
         return ResponseEntity.ok(shaftAssignmentService.getAll());

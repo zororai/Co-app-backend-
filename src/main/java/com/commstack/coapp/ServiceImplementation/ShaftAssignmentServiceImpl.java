@@ -22,6 +22,13 @@ import java.util.Optional;
 
 @Service
 public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
+
+    public List<ShaftAssignment> getByMinerId(String minerId) {
+        return repository.findAll().stream()
+                .filter(s -> minerId != null && minerId.equals(String.valueOf(s.getMinerId())))
+                .toList();
+    }
+
     @Autowired
     private SectionRepository sectionRepository;
 
@@ -82,49 +89,46 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
     @Override
     public ShaftAssignment create(ShaftAssignment shaftAssignment, Principal principal) {
         // Check if creating this shaft exceeds the allowed number in Section
-        if (shaftAssignment.getSectionName() != null && shaftAssignment.getMinerId() != null) {
-            Section section = sectionRepository.findBySectionNameAndMinerId(
-                    shaftAssignment.getSectionName(), String.valueOf(shaftAssignment.getMinerId()));
-            if (section != null) {
-                int allowed = section.getNumberOfShaft();
-                long currentCount = repository.findAll().stream()
-                        .filter(s -> shaftAssignment.getSectionName().equals(s.getSectionName()) &&
-                                shaftAssignment.getMinerId().equals(s.getMinerId()))
-                        .count();
-                if (currentCount >= allowed) {
-                    throw new IllegalStateException("Cannot create more shafts than allowed in section");
-                }
-            }
-        }
+
         shaftAssignment.setCreatedBy(principal.getName());
         shaftAssignment.setCreatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setUpdatedBy(principal.getName());
         shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
-        shaftAssignment.setStatus("PENDING");
-        shaftAssignment.setReason(null); // Assuming reason is not set during creation
+        shaftAssignment.setStatus("PENDING"); // Assuming reason is not set during creation
         ShaftAssignment saved = repository.save(shaftAssignment);
         // Update shaftnumber in Regminer or CompanyRegistration if minerId matches
-        if (saved.getMinerId() != null) {
+        boolean updated = false;
+        if (saved.getMinerId() != null && !saved.getMinerId().isEmpty()) {
+            // Check if the minerId exists in Regminer
+            // Assuming minerId is a String, adjust as necessary
             String minerIdStr = String.valueOf(saved.getMinerId());
-            boolean updated = false;
-            // Try Regminer first
             Optional<Regminer> regminerOpt = regMinerRepository.findById(minerIdStr);
+
             if (regminerOpt.isPresent()) {
                 Regminer regminer = regminerOpt.get();
-                regminer.setShaftnumber(
-                        saved.getShaftNumbers() != null ? Integer.parseInt(saved.getShaftNumbers()) : 0);
+
+                // Get the current shaft number
+                Integer shaftNumberObj = regminer.getShaftnumber();
+                int currentShaftNumber = shaftNumberObj != null ? shaftNumberObj : 0;
+
+                // Increment by 1
+                regminer.setShaftnumber(currentShaftNumber + 1);
+
                 regMinerRepository.save(regminer);
                 updated = true;
             }
+
             // If not found in Regminer, try CompanyRegistration
             if (!updated) {
                 companyRegistrationRepository.findById(minerIdStr).ifPresent(company -> {
-                    company.setShaftnumber(
-                            saved.getShaftNumbers() != null ? Integer.parseInt(saved.getShaftNumbers()) : 0);
+                    Integer shaftNumberObj = company.getShaftnumber();
+                    int currentShaftNumber = shaftNumberObj != null ? shaftNumberObj : 0;
+                    company.setShaftnumber(currentShaftNumber + 1);
                     companyRegistrationRepository.save(company);
                 });
             }
         }
+
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(saved.getId())
                 .action("CREATED")

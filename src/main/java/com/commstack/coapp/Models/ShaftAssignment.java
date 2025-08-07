@@ -21,9 +21,8 @@ public class ShaftAssignment {
     private String minerId;
     private String sectionName;
     private String shaftNumbers;
-    private BigDecimal medicalFee;
-    private BigDecimal regFee;
-    private int shaftNumber;
+    private String medicalFee;
+    private String regFee;
     private LocalDate startContractDate;
     private LocalDate endContractDate;
     private String status;
