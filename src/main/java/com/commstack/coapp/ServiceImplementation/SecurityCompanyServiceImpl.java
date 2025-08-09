@@ -25,14 +25,14 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
 
     @Override
     public ResponseEntity<String> create(SecurityCompany company, Principal principal) {
-        // Check if company with same BP number already exists
-        if (repository.findByBpNumber(company.getBpNumber()) != null) {
-            return ResponseEntity.badRequest().body("Company with this BP number already exists");
+        // Check if company with same registration number already exists
+        if (repository.findByRegistrationNumber(company.getRegistrationNumber()) != null) {
+            return ResponseEntity.badRequest().body("Company with this registration number already exists");
         }
 
-        // Check if company with same email already exists
-        if (repository.findByEmailAddress(company.getEmailAddress()) != null) {
-            return ResponseEntity.badRequest().body("Company with this email address already exists");
+        // Check if company with same contact email already exists
+        if (repository.findByContactEmail(company.getContactEmail()) != null) {
+            return ResponseEntity.badRequest().body("Company with this contact email already exists");
         }
 
         company.setCreatedBy(principal.getName());
@@ -47,7 +47,7 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
                 .userId(savedCompany.getId())
                 .action("CREATED")
                 .description("New security company registered: '" + company.getCompanyName() +
-                        "', BP Number: '" + company.getBpNumber() + "'")
+                        "', Registration Number: '" + company.getRegistrationNumber() + "'")
                 .doneBy(principal.getName())
                 .dateTime(LocalDateTime.now())
                 .build();
@@ -68,12 +68,13 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
 
     @Override
     public SecurityCompany findByEmailAddress(String emailAddress) {
-        return repository.findByEmailAddress(emailAddress);
+        return repository.findByContactEmail(emailAddress);
     }
 
     @Override
     public SecurityCompany findByBpNumber(String bpNumber) {
-        return repository.findByBpNumber(bpNumber);
+        // No bpNumber in new model, method can be removed or return null
+        return null;
     }
 
     @Override
@@ -82,38 +83,44 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
         if (existing.isPresent()) {
             SecurityCompany existingCompany = existing.get();
 
-            // Check if email is being changed and new email already exists
-            if (!existingCompany.getEmailAddress().equals(company.getEmailAddress()) &&
-                    repository.findByEmailAddress(company.getEmailAddress()) != null) {
-                return ResponseEntity.badRequest().body("Company with this email address already exists");
+            // Check if contact email is being changed and new email already exists
+            if (!existingCompany.getContactEmail().equals(company.getContactEmail()) &&
+                    repository.findByContactEmail(company.getContactEmail()) != null) {
+                return ResponseEntity.badRequest().body("Company with this contact email already exists");
             }
 
-            // Check if BP number is being changed and new BP number already exists
-            if (!existingCompany.getBpNumber().equals(company.getBpNumber()) &&
-                    repository.findByBpNumber(company.getBpNumber()) != null) {
-                return ResponseEntity.badRequest().body("Company with this BP number already exists");
+            // Check if registration number is being changed and new registration number
+            // already exists
+            if (!existingCompany.getRegistrationNumber().equals(company.getRegistrationNumber()) &&
+                    repository.findByRegistrationNumber(company.getRegistrationNumber()) != null) {
+                return ResponseEntity.badRequest().body("Company with this registration number already exists");
             }
 
             String originalStatus = existingCompany.getStatus();
 
             // Update fields
             existingCompany.setCompanyName(company.getCompanyName());
-            existingCompany.setBpNumber(company.getBpNumber());
-            existingCompany.setOwnerIdNumber(company.getOwnerIdNumber());
-            existingCompany.setOwnerName(company.getOwnerName());
-            existingCompany.setOwnerSurname(company.getOwnerSurname());
-            existingCompany.setOwnerAddress(company.getOwnerAddress());
-            existingCompany.setNumberOfEmployees(company.getNumberOfEmployees());
-            existingCompany.setCompanyAddress(company.getCompanyAddress());
-            existingCompany.setPosition(company.getPosition());
+            existingCompany.setRegistrationNumber(company.getRegistrationNumber());
+            existingCompany.setContactPhone(company.getContactPhone());
+            existingCompany.setContactPersonName(company.getContactPersonName());
+            existingCompany.setContactEmail(company.getContactEmail());
+            existingCompany.setSiteAddress(company.getSiteAddress());
+            existingCompany.setServiceType(company.getServiceType());
+            existingCompany.setHeadOfficeAddress(company.getHeadOfficeAddress());
+            existingCompany.setNumberOfWorks(company.getNumberOfWorks());
             existingCompany.setStartContractDate(company.getStartContractDate());
-            existingCompany.setEmailAddress(company.getEmailAddress());
-            existingCompany.setOwnerCellNumber(company.getOwnerCellNumber());
+            existingCompany.setEndContractDate(company.getEndContractDate());
+            existingCompany.setEmergencyContactPhone(company.getEmergencyContactPhone());
+            existingCompany.setEmergencyContactName(company.getEmergencyContactName());
+            existingCompany.setLocations(company.getLocations());
             existingCompany.setValidTaxClearance(company.getValidTaxClearance());
             existingCompany.setCompanyLogo(company.getCompanyLogo());
-            existingCompany.setCr14Copy(company.getCr14Copy());
+            existingCompany.setGetCertificateOfCooperation(company.getGetCertificateOfCooperation());
             existingCompany.setOperatingLicense(company.getOperatingLicense());
+            existingCompany.setProofOfInsurance(company.getProofOfInsurance());
+            existingCompany.setSiteRiskAssessmentReport(company.getSiteRiskAssessmentReport());
             existingCompany.setStatus(company.getStatus());
+            existingCompany.setReason(company.getReason());
             existingCompany.setUpdatedBy(principal.getName());
             existingCompany.setUpdatedAt(LocalDate.now());
 
@@ -144,7 +151,7 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
                     .userId(id)
                     .action("DELETED")
                     .description("Security company deleted: '" + company.getCompanyName() +
-                            "', BP Number: '" + company.getBpNumber() + "'")
+                            "', Registration Number: '" + company.getRegistrationNumber() + "'")
                     .doneBy(principal.getName())
                     .dateTime(LocalDateTime.now())
                     .build();

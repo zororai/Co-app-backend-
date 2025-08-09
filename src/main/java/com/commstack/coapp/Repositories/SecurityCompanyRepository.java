@@ -9,7 +9,7 @@ import java.util.List;
 public interface SecurityCompanyRepository extends MongoRepository<SecurityCompany, String> {
     List<SecurityCompany> findByStatus(String status);
 
-    SecurityCompany findByEmailAddress(String emailAddress);
+    SecurityCompany findByContactEmail(String contactEmail);
 
-    SecurityCompany findByBpNumber(String bpNumber);
+    SecurityCompany findByRegistrationNumber(String registrationNumber);
 }

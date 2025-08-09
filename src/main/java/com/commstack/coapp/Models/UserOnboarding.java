@@ -25,14 +25,13 @@ public class UserOnboarding {
     private String idNumber;
     private String address;
     private String cellNumber;
-    private LocalDate registrationDate;
     private String email;
     private String position;
+    private String location;
     private String role;
-
-    private String status; // PENDING, APPROVED, REJECTED, PUSHED_BACK
-    private String reason; // For rejection or pushback
-
+    private String status;
+    private String notes;
+    private String reason;
     // Audit fields
     private String createdBy;
     private String updatedBy;

@@ -52,17 +52,17 @@ public class UserOnboardingController {
         }
     }
 
-    @PostMapping("/{id}/approve")
+    @PutMapping("/{id}/approve")
     public ResponseEntity<String> approve(@PathVariable String id, Principal principal) {
         return service.approval(id, principal);
     }
 
-    @PostMapping("/{id}/reject")
+    @PutMapping("/{id}/reject")
     public ResponseEntity<String> reject(@PathVariable String id, @RequestParam String reason, Principal principal) {
         return service.reject(id, reason, principal);
     }
 
-    @PostMapping("/{id}/pushback")
+    @PutMapping("/{id}/pushback")
     public ResponseEntity<String> pushBack(@PathVariable String id, @RequestParam String reason, Principal principal) {
         return service.pushBack(id, reason, principal);
     }
