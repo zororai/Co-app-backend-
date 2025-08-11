@@ -22,13 +22,13 @@ public interface DriverService {
 
     ResponseEntity<String> pushBack(String id, String reason, Principal principal);
 
-    ResponseEntity<String> getAllPendingDrivers();
+    ResponseEntity<List<Driver>> getAllPendingDrivers();
 
-    ResponseEntity<String> getAllApprovedDrivers();
+    ResponseEntity<List<Driver>> getAllApprovedDrivers();
 
-    ResponseEntity<String> getAllRejectedDrivers();
+    ResponseEntity<List<Driver>> getAllRejectedDrivers();
 
-    ResponseEntity<String> getAllPushedBackDrivers();
+    ResponseEntity<List<Driver>> getAllPushedBackDrivers();
 
     Driver findByEmail(String email);
 
@@ -36,5 +36,4 @@ public interface DriverService {
 
     Driver findByLicenseNumber(String licenseNumber);
 
-    List<Driver> findByCompanyName(String companyName);
 }

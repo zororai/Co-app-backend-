@@ -1,0 +1,17 @@
+package com.commstack.coapp.Service;
+
+import com.commstack.coapp.Models.OreTransport;
+import org.springframework.http.ResponseEntity;
+import java.util.List;
+
+public interface OreTransportService {
+    ResponseEntity<String> create(OreTransport oreTransport, java.security.Principal principal);
+
+    List<OreTransport> getAll();
+
+    OreTransport getById(String id);
+
+    ResponseEntity<String> update(String id, OreTransport oreTransport, java.security.Principal principal);
+
+    ResponseEntity<String> delete(String id, java.security.Principal principal);
+}

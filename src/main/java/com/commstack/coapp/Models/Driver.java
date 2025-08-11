@@ -16,24 +16,22 @@ import java.time.LocalDate;
 public class Driver {
     @Id
     private String id;
-    private String name;
-    private String surname;
+    private String firstName;
+    private String lastName;
     private String idNumber;
-    private String address;
-    private String cellNumber;
-    private String email;
-    private String password;
-    private String companyName;
+    private LocalDate dateOfBirth;
     private String licenseNumber;
-    private String position;
-    private LocalDate startContractDate;
-
-    // Document uploads
-    private String driverLicense;
-    private String idCopy;
-    private String medicalCertificate;
-    private String defensiveDrivingCertificate;
-    private String profilePhoto;
+    private String licenseClass;
+    private LocalDate licenseExpiryDate;
+    private int yearsOfExperience;
+    private String phoneNumber;
+    private String emailAddress;
+    private String address;
+    private String emergencyContactName;
+    private String emergencyContactPhone;
+    private String driversLicenseCopyPath;
+    private String idDocumentCopyPath;
+    private String additionalNotes;
 
     // Status tracking
     private String status;

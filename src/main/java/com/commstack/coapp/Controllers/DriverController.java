@@ -14,12 +14,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/drivers")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @SecurityRequirement(name = "Bearer Authentication")
-@RequiredArgsConstructor
 public class DriverController {
 
     private final DriverService service;
+
+    @Autowired
+    public DriverController(DriverService service) {
+        this.service = service;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<String> registerDriver(@RequestBody Driver driver, Principal principal) {
@@ -51,11 +55,6 @@ public class DriverController {
         return service.findByLicenseNumber(licenseNumber);
     }
 
-    @GetMapping("/company/{companyName}")
-    public List<Driver> getDriversByCompany(@PathVariable String companyName) {
-        return service.findByCompanyName(companyName);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<String> updateDriver(@PathVariable String id,
             @RequestBody Driver driver, Principal principal) {
@@ -85,22 +84,22 @@ public class DriverController {
     }
 
     @GetMapping("/status/pending")
-    public ResponseEntity<String> getPendingDrivers() {
+    public ResponseEntity<List<Driver>> getPendingDrivers() {
         return service.getAllPendingDrivers();
     }
 
     @GetMapping("/status/approved")
-    public ResponseEntity<String> getApprovedDrivers() {
+    public ResponseEntity<List<Driver>> getApprovedDrivers() {
         return service.getAllApprovedDrivers();
     }
 
     @GetMapping("/status/rejected")
-    public ResponseEntity<String> getRejectedDrivers() {
+    public ResponseEntity<List<Driver>> getRejectedDrivers() {
         return service.getAllRejectedDrivers();
     }
 
     @GetMapping("/status/pushedback")
-    public ResponseEntity<String> getPushedBackDrivers() {
+    public ResponseEntity<List<Driver>> getPushedBackDrivers() {
         return service.getAllPushedBackDrivers();
     }
 }

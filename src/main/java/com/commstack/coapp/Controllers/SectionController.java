@@ -35,16 +35,6 @@ public class SectionController {
         return service.getById(id);
     }
 
-    @GetMapping("/miner/{minerId}")
-    public List<Section> getSectionsByMiner(@PathVariable String minerId) {
-        return service.findByMinerId(minerId);
-    }
-
-    @GetMapping("/shaft/{numberOfShaft}")
-    public List<Section> getSectionsByShaftNumber(@PathVariable String numberOfShaft) {
-        return service.findByNumberOfShaft(numberOfShaft);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<String> updateSection(@PathVariable String id,
             @RequestBody Section section, Principal principal) {

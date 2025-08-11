@@ -9,11 +9,10 @@ import java.util.List;
 public interface DriverRepository extends MongoRepository<Driver, String> {
     List<Driver> findByStatus(String status);
 
-    Driver findByEmail(String email);
+    Driver findByEmailAddress(String emailAddress);
 
     Driver findByIdNumber(String idNumber);
 
     Driver findByLicenseNumber(String licenseNumber);
 
-    List<Driver> findByCompanyName(String companyName);
 }

@@ -31,7 +31,7 @@ public class DriverServiceImpl implements DriverService {
         }
 
         // Check if driver with same email already exists
-        if (repository.findByEmail(driver.getEmail()) != null) {
+        if (repository.findByEmailAddress(driver.getEmailAddress()) != null) {
             return ResponseEntity.badRequest().body("Driver with this email already exists");
         }
 
@@ -51,7 +51,7 @@ public class DriverServiceImpl implements DriverService {
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(savedDriver.getId())
                 .action("CREATED")
-                .description("New driver registered: '" + driver.getName() + " " + driver.getSurname() +
+                .description("New driver registered: '" + driver.getFirstName() + " " + driver.getLastName() +
                         "', License Number: '" + driver.getLicenseNumber() + "'")
                 .doneBy(principal.getName())
                 .dateTime(LocalDateTime.now())
@@ -73,7 +73,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public Driver findByEmail(String email) {
-        return repository.findByEmail(email);
+        return repository.findByEmailAddress(email);
     }
 
     @Override
@@ -87,19 +87,14 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<Driver> findByCompanyName(String companyName) {
-        return repository.findByCompanyName(companyName);
-    }
-
-    @Override
     public ResponseEntity<String> update(String id, Driver driver, Principal principal) {
         Optional<Driver> existing = repository.findById(id);
         if (existing.isPresent()) {
             Driver existingDriver = existing.get();
 
             // Check if email is being changed and new email already exists
-            if (!existingDriver.getEmail().equals(driver.getEmail()) &&
-                    repository.findByEmail(driver.getEmail()) != null) {
+            if (!existingDriver.getEmailAddress().equals(driver.getEmailAddress()) &&
+                    repository.findByEmailAddress(driver.getEmailAddress()) != null) {
                 return ResponseEntity.badRequest().body("Driver with this email already exists");
             }
 
@@ -119,22 +114,24 @@ public class DriverServiceImpl implements DriverService {
             String originalStatus = existingDriver.getStatus();
 
             // Update fields
-            existingDriver.setName(driver.getName());
-            existingDriver.setSurname(driver.getSurname());
+            existingDriver.setFirstName(driver.getFirstName());
+            existingDriver.setLastName(driver.getLastName());
             existingDriver.setIdNumber(driver.getIdNumber());
-            existingDriver.setAddress(driver.getAddress());
-            existingDriver.setCellNumber(driver.getCellNumber());
-            existingDriver.setEmail(driver.getEmail());
-            existingDriver.setCompanyName(driver.getCompanyName());
+            existingDriver.setDateOfBirth(driver.getDateOfBirth());
             existingDriver.setLicenseNumber(driver.getLicenseNumber());
-            existingDriver.setPosition(driver.getPosition());
-            existingDriver.setStartContractDate(driver.getStartContractDate());
-            existingDriver.setDriverLicense(driver.getDriverLicense());
-            existingDriver.setIdCopy(driver.getIdCopy());
-            existingDriver.setMedicalCertificate(driver.getMedicalCertificate());
-            existingDriver.setDefensiveDrivingCertificate(driver.getDefensiveDrivingCertificate());
-            existingDriver.setProfilePhoto(driver.getProfilePhoto());
+            existingDriver.setLicenseClass(driver.getLicenseClass());
+            existingDriver.setLicenseExpiryDate(driver.getLicenseExpiryDate());
+            existingDriver.setYearsOfExperience(driver.getYearsOfExperience());
+            existingDriver.setPhoneNumber(driver.getPhoneNumber());
+            existingDriver.setEmailAddress(driver.getEmailAddress());
+            existingDriver.setAddress(driver.getAddress());
+            existingDriver.setEmergencyContactName(driver.getEmergencyContactName());
+            existingDriver.setEmergencyContactPhone(driver.getEmergencyContactPhone());
+            existingDriver.setDriversLicenseCopyPath(driver.getDriversLicenseCopyPath());
+            existingDriver.setIdDocumentCopyPath(driver.getIdDocumentCopyPath());
+            existingDriver.setAdditionalNotes(driver.getAdditionalNotes());
             existingDriver.setStatus(driver.getStatus());
+            existingDriver.setReason(driver.getReason());
             existingDriver.setUpdatedBy(principal.getName());
             existingDriver.setUpdatedAt(LocalDate.now());
 
@@ -164,7 +161,7 @@ public class DriverServiceImpl implements DriverService {
             UserAuditTrail audit = UserAuditTrail.builder()
                     .userId(id)
                     .action("DELETED")
-                    .description("Driver deleted: '" + driver.getName() + " " + driver.getSurname() +
+                    .description("Driver deleted: '" + driver.getFirstName() + " " + driver.getLastName() +
                             "', License Number: '" + driver.getLicenseNumber() + "'")
                     .doneBy(principal.getName())
                     .dateTime(LocalDateTime.now())
@@ -198,7 +195,7 @@ public class DriverServiceImpl implements DriverService {
                     .userId(id)
                     .action("APPROVED")
                     .description("Driver status changed from '" + originalStatus + "' to 'APPROVED' for: '" +
-                            driver.getName() + " " + driver.getSurname() + "'")
+                            driver.getFirstName() + " " + driver.getLastName() + "'")
                     .doneBy(principal.getName())
                     .dateTime(LocalDateTime.now())
                     .build();
@@ -268,26 +265,26 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public ResponseEntity<String> getAllPendingDrivers() {
+    public ResponseEntity<List<Driver>> getAllPendingDrivers() {
         List<Driver> drivers = repository.findByStatus("PENDING");
-        return ResponseEntity.ok(drivers.toString());
+        return ResponseEntity.ok(drivers);
     }
 
     @Override
-    public ResponseEntity<String> getAllApprovedDrivers() {
+    public ResponseEntity<List<Driver>> getAllApprovedDrivers() {
         List<Driver> drivers = repository.findByStatus("APPROVED");
-        return ResponseEntity.ok(drivers.toString());
+        return ResponseEntity.ok(drivers);
     }
 
     @Override
-    public ResponseEntity<String> getAllRejectedDrivers() {
+    public ResponseEntity<List<Driver>> getAllRejectedDrivers() {
         List<Driver> drivers = repository.findByStatus("REJECTED");
-        return ResponseEntity.ok(drivers.toString());
+        return ResponseEntity.ok(drivers);
     }
 
     @Override
-    public ResponseEntity<String> getAllPushedBackDrivers() {
+    public ResponseEntity<List<Driver>> getAllPushedBackDrivers() {
         List<Driver> drivers = repository.findByStatus("PUSHED_BACK");
-        return ResponseEntity.ok(drivers.toString());
+        return ResponseEntity.ok(drivers);
     }
 }
