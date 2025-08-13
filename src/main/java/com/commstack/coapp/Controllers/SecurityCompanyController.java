@@ -36,16 +36,6 @@ public class SecurityCompanyController {
         return service.getById(id);
     }
 
-    @GetMapping("/email/{emailAddress}")
-    public SecurityCompany getCompanyByEmail(@PathVariable String emailAddress) {
-        return service.findByEmailAddress(emailAddress);
-    }
-
-    @GetMapping("/bp/{bpNumber}")
-    public SecurityCompany getCompanyByBPNumber(@PathVariable String bpNumber) {
-        return service.findByBpNumber(bpNumber);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<String> updateCompany(@PathVariable String id,
             @RequestBody SecurityCompany company, Principal principal) {

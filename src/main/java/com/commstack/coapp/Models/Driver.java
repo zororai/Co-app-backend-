@@ -22,6 +22,7 @@ public class Driver {
     private LocalDate dateOfBirth;
     private String licenseNumber;
     private String licenseClass;
+    private String licenseDocument;
     private LocalDate licenseExpiryDate;
     private int yearsOfExperience;
     private String phoneNumber;

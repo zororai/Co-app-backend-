@@ -25,7 +25,10 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
 
     @Override
     public ResponseEntity<SecurityCompany> create(SecurityCompany company, Principal principal) {
-        // Check if company with same registration number already exists
+        // Check if company with same contact email already exists
+        if (repository.findByContactEmail(company.getContactEmail()) != null) {
+            return ResponseEntity.badRequest().body(null);
+        }
 
         company.setCreatedBy(principal.getName());
         company.setCreatedAt(LocalDate.now());

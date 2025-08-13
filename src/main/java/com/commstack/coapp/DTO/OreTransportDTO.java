@@ -24,7 +24,5 @@ public class OreTransportDTO {
     private List<Tax> tax;
     private String processStatus;
     private String location;
-    private LocalDateTime date;
-    private LocalDateTime time;
 
 }
