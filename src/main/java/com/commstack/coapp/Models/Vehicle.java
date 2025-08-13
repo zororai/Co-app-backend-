@@ -22,6 +22,7 @@ public class Vehicle {
     private String ownerCellNumber;
     private String ownerIdNumber;
     private String vehicleType;
+    private String make;
 
     // Document uploads
     private String idPicture;

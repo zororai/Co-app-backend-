@@ -31,7 +31,7 @@ public class Driver {
     private String emergencyContactName;
     private String emergencyContactPhone;
     private String driversLicenseCopyPath;
-    private String idDocumentCopyPath;
+    private String idDocument;
     private String additionalNotes;
 
     // Status tracking

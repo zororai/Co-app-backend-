@@ -128,7 +128,7 @@ public class DriverServiceImpl implements DriverService {
             existingDriver.setEmergencyContactName(driver.getEmergencyContactName());
             existingDriver.setEmergencyContactPhone(driver.getEmergencyContactPhone());
             existingDriver.setDriversLicenseCopyPath(driver.getDriversLicenseCopyPath());
-            existingDriver.setIdDocumentCopyPath(driver.getIdDocumentCopyPath());
+            existingDriver.setIdDocument(driver.getIdDocument());
             existingDriver.setAdditionalNotes(driver.getAdditionalNotes());
             existingDriver.setStatus(driver.getStatus());
             existingDriver.setReason(driver.getReason());
