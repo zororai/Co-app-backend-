@@ -6,7 +6,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface SecurityCompanyService {
-    ResponseEntity<String> create(SecurityCompany company, Principal principal);
+    ResponseEntity<SecurityCompany> create(SecurityCompany company, Principal principal);
 
     List<SecurityCompany> getAll();
 

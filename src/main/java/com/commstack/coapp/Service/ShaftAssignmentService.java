@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.Service;
 
 import com.commstack.coapp.Models.ShaftAssignment;
@@ -10,6 +11,8 @@ public interface ShaftAssignmentService {
     ShaftAssignment getById(String id);
 
     List<ShaftAssignment> getAll();
+
+    List<ShaftAssignment> getAllApproved();
 
     ShaftAssignment update(String id, ShaftAssignment shaftAssignment, Principal principal);
 

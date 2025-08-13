@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.ShaftAssignment;
@@ -24,6 +25,13 @@ public class ShaftAssignmentController {
     @PostMapping
     public ResponseEntity<ShaftAssignment> create(@RequestBody ShaftAssignment shaftAssignment, Principal principal) {
         return ResponseEntity.ok(shaftAssignmentService.create(shaftAssignment, principal));
+    }
+
+    @GetMapping("/approved")
+    public ResponseEntity<List<ShaftAssignment>> getAllApproved() {
+        List<ShaftAssignment> assignments = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .getAllApproved();
+        return ResponseEntity.ok(assignments);
     }
 
     @GetMapping("/{id}")
@@ -58,7 +66,7 @@ public class ShaftAssignmentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/pushback")
+    @PutMapping("/{id}/pushback")
     public ResponseEntity<ShaftAssignment> pushBack(@PathVariable String id,
             @RequestParam String reason,
             Principal principal) {
@@ -67,7 +75,7 @@ public class ShaftAssignmentController {
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/{id}/approve")
+    @PutMapping("/{id}/approve")
     public ResponseEntity<ShaftAssignment> approve(@PathVariable String id, Principal principal) {
         ShaftAssignment updated = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
                 .approve(id, principal);

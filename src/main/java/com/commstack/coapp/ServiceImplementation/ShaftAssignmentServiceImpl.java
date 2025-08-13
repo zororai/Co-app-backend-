@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Repositories.SectionRepository;
@@ -53,6 +54,12 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
             return updated;
         }
         return null;
+    }
+
+    public List<ShaftAssignment> getAllApproved() {
+        return repository.findAll().stream()
+                .filter(s -> "APPROVED".equalsIgnoreCase(s.getStatus()))
+                .toList();
     }
 
     public ShaftAssignment approve(String id, Principal principal) {

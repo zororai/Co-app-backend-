@@ -24,16 +24,8 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public ResponseEntity<String> create(SecurityCompany company, Principal principal) {
+    public ResponseEntity<SecurityCompany> create(SecurityCompany company, Principal principal) {
         // Check if company with same registration number already exists
-        if (repository.findByRegistrationNumber(company.getRegistrationNumber()) != null) {
-            return ResponseEntity.badRequest().body("Company with this registration number already exists");
-        }
-
-        // Check if company with same contact email already exists
-        if (repository.findByContactEmail(company.getContactEmail()) != null) {
-            return ResponseEntity.badRequest().body("Company with this contact email already exists");
-        }
 
         company.setCreatedBy(principal.getName());
         company.setCreatedAt(LocalDate.now());
@@ -53,7 +45,7 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
                 .build();
         mongoTemplate.save(audit, "security_company_audit_trail");
 
-        return ResponseEntity.ok("Security company registered successfully");
+        return ResponseEntity.ok(savedCompany);
     }
 
     @Override

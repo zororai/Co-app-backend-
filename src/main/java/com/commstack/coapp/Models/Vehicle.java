@@ -21,6 +21,7 @@ public class Vehicle {
     private String ownerAddress;
     private String ownerCellNumber;
     private String ownerIdNumber;
+    private String vehicleType;
 
     // Document uploads
     private String idPicture;

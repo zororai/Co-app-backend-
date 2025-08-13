@@ -1,5 +1,6 @@
 package com.commstack.coapp.ServiceImplementation;
 
+import com.commstack.coapp.Models.CompanyRegistration;
 import com.commstack.coapp.Models.MinerAuditTrail;
 import com.commstack.coapp.Models.OreTransport;
 import com.commstack.coapp.Models.OreTransportAuditTrail;
@@ -34,16 +35,24 @@ public class OreTransportServiceImpl implements OreTransportService {
     }
 
     @Override
-    public ResponseEntity<String> create(OreTransport oreTransport, Principal principal) {
-
+    public ResponseEntity<OreTransport> create(com.commstack.coapp.DTO.OreTransportDTO oreTransportDTO,
+            Principal principal) {
+        OreTransport oreTransport = OreTransport.builder()
+                .shaftNumbers(oreTransportDTO.getShaftNumbers())
+                .weight(oreTransportDTO.getWeight())
+                .numberOfBags(oreTransportDTO.getNumberOfBags())
+                .transportStatus(oreTransportDTO.getTransportStatus())
+                .tax(oreTransportDTO.getTax())
+                .processStatus(oreTransportDTO.getProcessStatus())
+                .location(oreTransportDTO.getLocation())
+                .build();
         oreTransport.setId(generateRegistrationNumber());
+        oreTransport.setOreUniqueId(generateRegistrationNumber());
         oreTransport.setCreatedBy(principal != null ? principal.getName() : "system");
-        oreTransport.setCreatedDate(LocalDate.now());
+        oreTransport.setCreatedDate(LocalDateTime.now());
         oreTransport.setSelectedTransportdriver("Not Selected");
         oreTransport.setSelectedTransport("Not Selected");
         oreTransport.setTransportReason("Not specified");
-        oreTransport.setLocation("Not Specified");
-        oreTransport.setProcessStatus("Not loaded");
 
         OreTransport saved = repository.save(oreTransport);
         OreTransportAuditTrail audit = OreTransportAuditTrail.builder()
@@ -54,7 +63,7 @@ public class OreTransportServiceImpl implements OreTransportService {
                 .dateTime(LocalDateTime.now())
                 .build();
         mongoTemplate.save(audit, "ore_transport_audit_trail");
-        return ResponseEntity.ok("Ore transport created successfully");
+        return ResponseEntity.ok(saved);
     }
 
     @Override
@@ -85,7 +94,7 @@ public class OreTransportServiceImpl implements OreTransportService {
             transport.setTransportReason(TransportReason);
             transport.setLocation(Location);
             transport.setUpdatedBy(principal.getName());
-            transport.setUpdatedDate(LocalDate.now());
+            transport.setUpdatedDate(LocalDateTime.now());
 
             // Save the transport
             repository.save(transport);
@@ -123,7 +132,7 @@ public class OreTransportServiceImpl implements OreTransportService {
             existingTransport.setDate(oreTransport.getDate());
             existingTransport.setTime(oreTransport.getTime());
             existingTransport.setUpdatedBy(principal != null ? principal.getName() : "system");
-            existingTransport.setUpdatedDate(LocalDate.now());
+            existingTransport.setUpdatedDate(LocalDateTime.now());
 
             repository.save(existingTransport);
             UserAuditTrail audit = UserAuditTrail.builder()

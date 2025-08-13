@@ -1,9 +1,12 @@
 package com.commstack.coapp.Controllers;
 
+import com.commstack.coapp.DTO.OreTransportDTO;
+import com.commstack.coapp.Models.Driver;
 import com.commstack.coapp.Models.OreTransport;
 import com.commstack.coapp.Service.OreTransportService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,20 +19,17 @@ import java.util.List;
 @RequestMapping("/api/ore-transports")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @SecurityRequirement(name = "Bearer Authentication")
+@RequiredArgsConstructor
 public class OreTransportController {
 
     private final OreTransportService service;
 
-    public OreTransportController(OreTransportService service) {
-        this.service = service;
+    @PostMapping("/create")
+    public ResponseEntity<OreTransport> create(@RequestBody OreTransportDTO oreTransportDTO, Principal principal) {
+        return service.create(oreTransportDTO, principal);
     }
 
-    @PostMapping
-    public ResponseEntity<String> create(@RequestBody OreTransport oreTransport, Principal principal) {
-        return service.create(oreTransport, principal);
-    }
-
-    @GetMapping
+    @GetMapping("/allOre")
     public List<OreTransport> getAll() {
         return service.getAll();
     }

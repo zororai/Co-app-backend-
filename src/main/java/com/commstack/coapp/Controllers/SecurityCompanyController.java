@@ -22,7 +22,7 @@ public class SecurityCompanyController {
     private final SecurityCompanyService service;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerCompany(@RequestBody SecurityCompany company, Principal principal) {
+    public ResponseEntity<SecurityCompany> registerCompany(@RequestBody SecurityCompany company, Principal principal) {
         return service.create(company, principal);
     }
 

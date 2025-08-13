@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 // ...existing code...
 import com.commstack.coapp.Models.Tax;
@@ -16,13 +15,13 @@ import com.commstack.coapp.Models.Tax;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "ore_transports")
+@Document(collection = "ore")
 
 public class OreTransport {
     @Id
     private String id;
     private String oreUniqueId;
-    private List<String> shaftNumbers;
+    private String shaftNumbers;
     private double weight;
     private int numberOfBags;
     private String transportStatus;
@@ -32,10 +31,10 @@ public class OreTransport {
     private String transportReason;
     private String processStatus;
     private String location;
-    private LocalDate date;
-    private LocalTime time;
+    private LocalDateTime date;
+    private LocalDateTime time;
     private String createdBy;
     private String updatedBy;
-    private LocalDate createdDate;
-    private LocalDate updatedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 }

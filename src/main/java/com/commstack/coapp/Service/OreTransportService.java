@@ -1,11 +1,12 @@
 package com.commstack.coapp.Service;
 
+import com.commstack.coapp.DTO.OreTransportDTO;
 import com.commstack.coapp.Models.OreTransport;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface OreTransportService {
-    ResponseEntity<String> create(OreTransport oreTransport, java.security.Principal principal);
+    ResponseEntity<OreTransport> create(OreTransportDTO oreTransportDTO, java.security.Principal principal);
 
     List<OreTransport> getAll();
 
