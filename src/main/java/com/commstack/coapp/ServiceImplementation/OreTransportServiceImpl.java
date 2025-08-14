@@ -22,6 +22,33 @@ import java.util.Optional;
 @Service
 public class OreTransportServiceImpl implements OreTransportService {
 
+    public ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver,
+            String transportStatus, String selectedTransport, String transportReason, Principal principal) {
+        Optional<OreTransport> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            OreTransport transport = existing.get();
+            transport.setSelectedTransportdriver(selectedTransportdriver);
+            transport.setTransportStatus(transportStatus);
+            transport.setSelectedTransport(selectedTransport);
+            transport.setTransportReason(transportReason);
+            transport.setUpdatedBy(principal != null ? principal.getName() : "system");
+            transport.setUpdatedDate(LocalDateTime.now());
+            repository.save(transport);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("UPDATED_FIELDS")
+                    .description(
+                            "Updated selectedTransportdriver, transportStatus, selectedTransport, transportReason for OreTransport id="
+                                    + id)
+                    .doneBy(principal != null ? principal.getName() : "system")
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "ore_transport_audit_trail");
+            return ResponseEntity.ok("OreTransport fields updated successfully");
+        }
+        return ResponseEntity.status(404).body("OreTransport not found");
+    }
+
     @Autowired
     private OreTransportRepository repository;
 

@@ -22,6 +22,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OreTransportController {
 
+    @PutMapping("/{id}/fields")
+    public ResponseEntity<String> updateTransportFields(
+            @PathVariable String id,
+            @RequestParam String selectedTransportdriver,
+            @RequestParam String transportStatus,
+            @RequestParam String selectedTransport,
+            @RequestParam String transportReason,
+            Principal principal) {
+        return service.updateTransportFields(id, selectedTransportdriver, transportStatus, selectedTransport,
+                transportReason, principal);
+    }
+
     private final OreTransportService service;
 
     @PostMapping("/create")

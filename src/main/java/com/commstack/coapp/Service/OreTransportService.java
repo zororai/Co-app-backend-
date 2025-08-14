@@ -6,6 +6,10 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface OreTransportService {
+
+    ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver, String transportStatus,
+            String selectedTransport, String transportReason, java.security.Principal principal);
+
     ResponseEntity<OreTransport> create(OreTransportDTO oreTransportDTO, java.security.Principal principal);
 
     List<OreTransport> getAll();
