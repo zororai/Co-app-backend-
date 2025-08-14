@@ -16,13 +16,18 @@ import java.time.LocalDate;
 public class Vehicle {
     @Id
     private String id;
+    private String assignedDriver;
     private String regNumber;
     private String ownerName;
     private String ownerAddress;
     private String ownerCellNumber;
     private String ownerIdNumber;
     private String vehicleType;
+    private String year;
     private String make;
+    private String operationalStatus;
+    private String model;
+    private LocalDate lastServiceDate;
 
     // Document uploads
     private String idPicture;

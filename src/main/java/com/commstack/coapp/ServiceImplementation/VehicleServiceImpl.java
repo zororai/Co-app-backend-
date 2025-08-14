@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.Vehicle;
@@ -17,6 +18,94 @@ import java.util.Optional;
 @Service
 public class VehicleServiceImpl implements VehicleService {
 
+    public ResponseEntity<String> setToInTransit(String id, Principal principal) {
+        Optional<Vehicle> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            Vehicle vehicle = existing.get();
+            vehicle.setOperationalStatus("in transit");
+            vehicle.setUpdatedBy(principal.getName());
+            vehicle.setUpdatedAt(LocalDate.now());
+            repository.save(vehicle);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("IN_TRANSIT")
+                    .description("Vehicle operational status set to 'in transit' for Registration Number: '"
+                            + vehicle.getRegNumber() + "'")
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "vehicle_audit_trail");
+            return ResponseEntity.ok("Vehicle operational status updated to in transit");
+        }
+        return ResponseEntity.status(404).body("Vehicle not found");
+    }
+
+    public ResponseEntity<String> setToLoading(String id, Principal principal) {
+        Optional<Vehicle> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            Vehicle vehicle = existing.get();
+            vehicle.setOperationalStatus("Loading");
+            vehicle.setUpdatedBy(principal.getName());
+            vehicle.setUpdatedAt(LocalDate.now());
+            repository.save(vehicle);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("LOADING")
+                    .description("Vehicle operational status set to 'Loading' for Registration Number: '"
+                            + vehicle.getRegNumber() + "'")
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "vehicle_audit_trail");
+            return ResponseEntity.ok("Vehicle operational status updated to Loading");
+        }
+        return ResponseEntity.status(404).body("Vehicle not found");
+    }
+
+    public ResponseEntity<String> setToIdle(String id, Principal principal) {
+        Optional<Vehicle> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            Vehicle vehicle = existing.get();
+            vehicle.setOperationalStatus("idle");
+            vehicle.setUpdatedBy(principal.getName());
+            vehicle.setUpdatedAt(LocalDate.now());
+            repository.save(vehicle);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("IDLE")
+                    .description("Vehicle operational status set to 'idle' for Registration Number: '"
+                            + vehicle.getRegNumber() + "'")
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "vehicle_audit_trail");
+            return ResponseEntity.ok("Vehicle operational status updated to idle");
+        }
+        return ResponseEntity.status(404).body("Vehicle not found");
+    }
+
+    public ResponseEntity<String> setToMaintainance(String id, Principal principal) {
+        Optional<Vehicle> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            Vehicle vehicle = existing.get();
+            vehicle.setOperationalStatus("Maintainance");
+            vehicle.setUpdatedBy(principal.getName());
+            vehicle.setUpdatedAt(LocalDate.now());
+            repository.save(vehicle);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("MAINTAINANCE")
+                    .description("Vehicle operational status set to 'Maintainance' for Registration Number: '"
+                            + vehicle.getRegNumber() + "'")
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "vehicle_audit_trail");
+            return ResponseEntity.ok("Vehicle operational status updated to Maintainance");
+        }
+        return ResponseEntity.status(404).body("Vehicle not found");
+    }
+
     @Autowired
     private VehicleRepository repository;
 
@@ -29,13 +118,13 @@ public class VehicleServiceImpl implements VehicleService {
         if (repository.findByRegNumber(vehicle.getRegNumber()) != null) {
             return ResponseEntity.badRequest().body("Vehicle with this registration number already exists");
         }
-
+        vehicle.setOperationalStatus("idle");
         vehicle.setCreatedBy(principal.getName());
         vehicle.setCreatedAt(LocalDate.now());
         vehicle.setUpdatedBy(principal.getName());
         vehicle.setUpdatedAt(LocalDate.now());
         vehicle.setStatus("PENDING");
-
+        // 'Idle' 'Loading' 'Loaded' 'Maintainance
         Vehicle savedVehicle = repository.save(vehicle);
 
         UserAuditTrail audit = UserAuditTrail.builder()
@@ -54,6 +143,12 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public List<Vehicle> getAll() {
         return repository.findAll();
+    }
+
+    public List<Vehicle> getAllIdleVehicles() {
+        return repository.findAll().stream()
+                .filter(v -> "idle".equalsIgnoreCase(v.getOperationalStatus()))
+                .toList();
     }
 
     @Override
@@ -234,26 +329,26 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public ResponseEntity<String> getAllPendingVehicles() {
+    public ResponseEntity getAllPendingVehicles() {
         List<Vehicle> vehicles = repository.findByStatus("PENDING");
-        return ResponseEntity.ok(vehicles.toString());
+        return ResponseEntity.ok(vehicles);
     }
 
     @Override
-    public ResponseEntity<String> getAllApprovedVehicles() {
+    public ResponseEntity getAllApprovedVehicles() {
         List<Vehicle> vehicles = repository.findByStatus("APPROVED");
-        return ResponseEntity.ok(vehicles.toString());
+        return ResponseEntity.ok(vehicles);
     }
 
     @Override
-    public ResponseEntity<String> getAllRejectedVehicles() {
+    public ResponseEntity getAllRejectedVehicles() {
         List<Vehicle> vehicles = repository.findByStatus("REJECTED");
-        return ResponseEntity.ok(vehicles.toString());
+        return ResponseEntity.ok(vehicles);
     }
 
     @Override
-    public ResponseEntity<String> getAllPushedBackVehicles() {
+    public ResponseEntity getAllPushedBackVehicles() {
         List<Vehicle> vehicles = repository.findByStatus("PUSHED_BACK");
-        return ResponseEntity.ok(vehicles.toString());
+        return ResponseEntity.ok(vehicles);
     }
 }

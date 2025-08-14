@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.Service;
 
 import com.commstack.coapp.Models.Vehicle;
@@ -6,11 +7,22 @@ import java.security.Principal;
 import java.util.List;
 
 public interface VehicleService {
+
+    ResponseEntity<String> setToInTransit(String id, Principal principal);
+
+    ResponseEntity<String> setToLoading(String id, Principal principal);
+
+    ResponseEntity<String> setToIdle(String id, Principal principal);
+
+    ResponseEntity<String> setToMaintainance(String id, Principal principal);
+
     ResponseEntity<String> create(Vehicle vehicle, Principal principal);
 
     List<Vehicle> getAll();
 
     Vehicle getById(String id);
+
+    List<Vehicle> getAllIdleVehicles();
 
     ResponseEntity<String> update(String id, Vehicle vehicle, Principal principal);
 

@@ -19,11 +19,36 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VehicleController {
 
+    @PutMapping("/{id}/in-transit")
+    public ResponseEntity<String> setVehicleToInTransit(@PathVariable String id, Principal principal) {
+        return service.setToInTransit(id, principal);
+    }
+
+    @PutMapping("/{id}/loading")
+    public ResponseEntity<String> setVehicleToLoading(@PathVariable String id, Principal principal) {
+        return service.setToLoading(id, principal);
+    }
+
+    @PutMapping("/{id}/idle")
+    public ResponseEntity<String> setVehicleToIdle(@PathVariable String id, Principal principal) {
+        return service.setToIdle(id, principal);
+    }
+
+    @PutMapping("/{id}/maintainance")
+    public ResponseEntity setVehicleToMaintainance(@PathVariable String id, Principal principal) {
+        return service.setToMaintainance(id, principal);
+    }
+
     private final VehicleService service;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerVehicle(@RequestBody Vehicle vehicle, Principal principal) {
         return service.create(vehicle, principal);
+    }
+
+    @GetMapping("/idle")
+    public ResponseEntity<List<Vehicle>> getAllIdleVehicles() {
+        return ResponseEntity.ok(service.getAllIdleVehicles());
     }
 
     @GetMapping
@@ -34,21 +59,6 @@ public class VehicleController {
     @GetMapping("/{id}")
     public Vehicle getVehicleById(@PathVariable String id) {
         return service.getById(id);
-    }
-
-    @GetMapping("/reg-number/{regNumber}")
-    public Vehicle getVehicleByRegNumber(@PathVariable String regNumber) {
-        return service.findByRegNumber(regNumber);
-    }
-
-    @GetMapping("/owner-name/{ownerName}")
-    public List<Vehicle> getVehiclesByOwnerName(@PathVariable String ownerName) {
-        return service.findByOwnerName(ownerName);
-    }
-
-    @GetMapping("/owner-id/{ownerIdNumber}")
-    public Vehicle getVehicleByOwnerIdNumber(@PathVariable String ownerIdNumber) {
-        return service.findByOwnerIdNumber(ownerIdNumber);
     }
 
     @PutMapping("/{id}")
