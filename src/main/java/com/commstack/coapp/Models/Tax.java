@@ -12,6 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tax {
+
+    private String id;
     private String taxType;
     private double taxRate;
+    private String location;
+    private String description;
+    private String status;
 }

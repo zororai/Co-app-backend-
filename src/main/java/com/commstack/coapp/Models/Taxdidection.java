@@ -1,5 +1,6 @@
 package com.commstack.coapp.Models;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -13,9 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Document(collection = "tax_deductions")
 public class Taxdidection {
+    private String reason;
+    @Id
     private String id;
     private String taxType;
     private double taxRate;
     private String location;
     private String description;
+    private String status;
 }
