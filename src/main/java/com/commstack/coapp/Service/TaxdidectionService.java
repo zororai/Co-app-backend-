@@ -6,6 +6,13 @@ import java.security.Principal;
 import java.util.List;
 
 public interface TaxdidectionService {
+
+    List<Taxdidection> getAllApproved();
+
+    List<Taxdidection> getAllRejected();
+
+    List<Taxdidection> getAllPushedBack();
+
     ResponseEntity<Taxdidection> create(Taxdidection taxdidection, Principal principal);
 
     List<Taxdidection> getAll();

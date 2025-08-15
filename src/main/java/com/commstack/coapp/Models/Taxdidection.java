@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Document(collection = "tax_deductions")
 public class Taxdidection {
-    private String reason;
+
     @Id
     private String id;
     private String taxType;
@@ -22,4 +22,5 @@ public class Taxdidection {
     private String location;
     private String description;
     private String status;
+    private String reason;
 }

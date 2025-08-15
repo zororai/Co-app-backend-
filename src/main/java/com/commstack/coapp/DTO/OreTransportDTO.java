@@ -20,7 +20,10 @@ public class OreTransportDTO {
     private String shaftNumbers;
     private double weight;
     private int numberOfBags;
+    private double newWeight;
+    private int newnumberOfBags;
     private String transportStatus;
+    private String dedicationReason;
     private List<Tax> tax;
     private String processStatus;
     private String location;

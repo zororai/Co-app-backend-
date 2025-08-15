@@ -22,8 +22,11 @@ public class OreTransport {
     private String id;
     private String oreUniqueId;
     private String shaftNumbers;
-    private double weight;
+    private double newWeight;
+    private int newnumberOfBags;
     private int numberOfBags;
+    private double weight;
+    private String dedicationReason;
     private String transportStatus;
     private String selectedTransportdriver;
     private String selectedTransport;

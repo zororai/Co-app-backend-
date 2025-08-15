@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface OreTransportService {
 
+    ResponseEntity<OreTransport> applyTaxAndDeduct(String id, java.security.Principal principal);
+
     ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver, String transportStatus,
             String selectedTransport, String transportReason, java.security.Principal principal);
 

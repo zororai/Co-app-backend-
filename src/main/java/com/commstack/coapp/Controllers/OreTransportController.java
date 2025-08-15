@@ -1,14 +1,12 @@
 package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.DTO.OreTransportDTO;
-import com.commstack.coapp.Models.Driver;
 import com.commstack.coapp.Models.OreTransport;
 import com.commstack.coapp.Service.OreTransportService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,5 +58,10 @@ public class OreTransportController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable String id, Principal principal) {
         return service.delete(id, principal);
+    }
+
+    @PutMapping("/{id}/apply-tax")
+    public ResponseEntity<OreTransport> applyTaxAndDeduct(@PathVariable String id, Principal principal) {
+        return service.applyTaxAndDeduct(id, principal);
     }
 }

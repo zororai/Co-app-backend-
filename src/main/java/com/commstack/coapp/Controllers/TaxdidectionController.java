@@ -18,6 +18,22 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class TaxdidectionController {
+
+    @GetMapping("/approved")
+    public List<Taxdidection> getAllApproved() {
+        return service.getAllApproved();
+    }
+
+    @GetMapping("/rejected")
+    public List<Taxdidection> getAllRejected() {
+        return service.getAllRejected();
+    }
+
+    @GetMapping("/pushed-back")
+    public List<Taxdidection> getAllPushedBack() {
+        return service.getAllPushedBack();
+    }
+
     private final TaxdidectionService service;
 
     @PostMapping

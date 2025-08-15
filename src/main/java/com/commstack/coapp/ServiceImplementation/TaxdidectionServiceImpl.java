@@ -1,6 +1,8 @@
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.UserAuditTrail;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.commstack.coapp.Models.Taxdidection;
@@ -8,10 +10,43 @@ import com.commstack.coapp.Service.TaxdidectionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
 public class TaxdidectionServiceImpl implements TaxdidectionService {
+
+    public List<Taxdidection> getAllApproved() {
+        List<Taxdidection> result = new ArrayList<>();
+        for (Taxdidection t : store.values()) {
+            if ("APPROVED".equalsIgnoreCase(t.getStatus())) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    public List<Taxdidection> getAllRejected() {
+        List<Taxdidection> result = new ArrayList<>();
+        for (Taxdidection t : store.values()) {
+            if ("REJECTED".equalsIgnoreCase(t.getStatus())) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    public List<Taxdidection> getAllPushedBack() {
+        List<Taxdidection> result = new ArrayList<>();
+        for (Taxdidection t : store.values()) {
+            if ("PUSHED_BACK".equalsIgnoreCase(t.getStatus())) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    @Autowired
     private MongoTemplate mongoTemplate;
     private final Map<String, Taxdidection> store = new HashMap<>();
 
@@ -20,6 +55,8 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
         String id = UUID.randomUUID().toString();
         taxdidection.setId(id);
         taxdidection.setStatus("PENDING");
+        taxdidection.setReason("");
+
         store.put(id, taxdidection);
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(id)

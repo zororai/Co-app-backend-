@@ -22,6 +22,47 @@ import java.util.Optional;
 @Service
 public class OreTransportServiceImpl implements OreTransportService {
 
+    public ResponseEntity<OreTransport> applyTaxAndDeduct(String id, Principal principal) {
+        Optional<OreTransport> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            OreTransport transport = existing.get();
+            // Assume getTax() returns a List<Tax> or a single Tax object
+            double totalTaxRate = 0.0;
+            if (transport.getTax() instanceof List) {
+                for (Object t : (List<?>) transport.getTax()) {
+                    if (t instanceof com.commstack.coapp.Models.Tax tax) {
+                        totalTaxRate += tax.getTaxRate();
+                    }
+                }
+            } else if (transport.getTax() instanceof com.commstack.coapp.Models.Tax tax) {
+                totalTaxRate = tax.getTaxRate();
+            }
+
+            double originalWeight = transport.getWeight();
+            int originalBags = transport.getNumberOfBags();
+            double newWeight = originalWeight - (originalWeight * totalTaxRate / 100.0);
+            int newnumberOfBags = (int) Math.round(originalBags - (originalBags * totalTaxRate / 100.0));
+            transport.setNewWeight(newWeight);
+            transport.setNewnumberOfBags(newnumberOfBags);
+            transport.setUpdatedDate(LocalDateTime.now());
+            transport.setDedicationReason(id + " - Tax applied and deducted");
+            repository.save(transport);
+            // Optionally, add audit trail for tax application
+            if (principal != null) {
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(id)
+                        .action("APPLY_TAX_AND_DEDUCT")
+                        .description("Applied tax and deducted from OreTransport id=" + id)
+                        .doneBy(principal.getName())
+                        .dateTime(LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "ore_transport_audit_trail");
+            }
+            return ResponseEntity.ok(transport);
+        }
+        return ResponseEntity.status(404).body(null);
+    }
+
     public ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver,
             String transportStatus, String selectedTransport, String transportReason, Principal principal) {
         Optional<OreTransport> existing = repository.findById(id);
@@ -74,6 +115,9 @@ public class OreTransportServiceImpl implements OreTransportService {
                 .location(oreTransportDTO.getLocation())
                 .build();
         oreTransport.setId(generateRegistrationNumber());
+        oreTransportDTO.setDedicationReason("Not specified");
+        oreTransport.setNewnumberOfBags(0);
+        oreTransport.setNewWeight(0);
         oreTransport.setOreUniqueId(generateRegistrationNumber());
         oreTransport.setCreatedBy(principal != null ? principal.getName() : "system");
         oreTransport.setCreatedDate(LocalDateTime.now());

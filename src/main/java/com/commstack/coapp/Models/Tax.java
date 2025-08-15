@@ -1,5 +1,7 @@
 package com.commstack.coapp.Models;
 
+import java.time.LocalDate;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -19,4 +21,5 @@ public class Tax {
     private String location;
     private String description;
     private String status;
+
 }
