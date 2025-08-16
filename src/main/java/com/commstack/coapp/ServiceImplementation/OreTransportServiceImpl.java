@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.CompanyRegistration;
@@ -63,8 +64,16 @@ public class OreTransportServiceImpl implements OreTransportService {
         return ResponseEntity.status(404).body(null);
     }
 
+    public List<OreTransport> getAllWithSelectedTransportdriverChanged() {
+        return repository.findAll().stream()
+                .filter(t -> t.getSelectedTransportdriver() != null
+                        && !"Not Selected".equals(t.getSelectedTransportdriver()))
+                .toList();
+    }
+
     public ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver,
-            String transportStatus, String selectedTransport, String transportReason, Principal principal) {
+            String transportStatus, String selectedTransport, String transportReason, String location,
+            Principal principal) {
         Optional<OreTransport> existing = repository.findById(id);
         if (existing.isPresent()) {
             OreTransport transport = existing.get();
@@ -72,6 +81,7 @@ public class OreTransportServiceImpl implements OreTransportService {
             transport.setTransportStatus(transportStatus);
             transport.setSelectedTransport(selectedTransport);
             transport.setTransportReason(transportReason);
+            transport.setLocation(location);
             transport.setUpdatedBy(principal != null ? principal.getName() : "system");
             transport.setUpdatedDate(LocalDateTime.now());
             repository.save(transport);

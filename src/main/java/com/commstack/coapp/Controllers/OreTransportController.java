@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.DTO.OreTransportDTO;
@@ -27,9 +28,10 @@ public class OreTransportController {
             @RequestParam String transportStatus,
             @RequestParam String selectedTransport,
             @RequestParam String transportReason,
+            @RequestParam String location,
             Principal principal) {
         return service.updateTransportFields(id, selectedTransportdriver, transportStatus, selectedTransport,
-                transportReason, principal);
+                transportReason, location, principal);
     }
 
     private final OreTransportService service;
@@ -42,6 +44,11 @@ public class OreTransportController {
     @GetMapping("/allOre")
     public List<OreTransport> getAll() {
         return service.getAll();
+    }
+
+    @GetMapping("/with-selected-transportdriver-changed")
+    public List<OreTransport> getAllWithSelectedTransportdriverChanged() {
+        return service.getAllWithSelectedTransportdriverChanged();
     }
 
     @GetMapping("/{id}")

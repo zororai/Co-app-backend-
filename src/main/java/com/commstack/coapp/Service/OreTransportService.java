@@ -10,9 +10,11 @@ public interface OreTransportService {
     ResponseEntity<OreTransport> applyTaxAndDeduct(String id, java.security.Principal principal);
 
     ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver, String transportStatus,
-            String selectedTransport, String transportReason, java.security.Principal principal);
+            String selectedTransport, String transportReason, String location, java.security.Principal principal);
 
     ResponseEntity<OreTransport> create(OreTransportDTO oreTransportDTO, java.security.Principal principal);
+
+    List<OreTransport> getAllWithSelectedTransportdriverChanged();
 
     List<OreTransport> getAll();
 
