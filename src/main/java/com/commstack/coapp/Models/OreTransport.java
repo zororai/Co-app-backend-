@@ -32,6 +32,7 @@ public class OreTransport {
     private String selectedTransport;
     private List<Tax> tax;
     private String transportReason;
+    private String securityDispatcherStatus;
     private String processStatus;
     private String location;
     private LocalDateTime date;

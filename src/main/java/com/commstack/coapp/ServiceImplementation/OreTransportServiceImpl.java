@@ -1,4 +1,3 @@
-
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.CompanyRegistration;
@@ -71,6 +70,61 @@ public class OreTransportServiceImpl implements OreTransportService {
                 .toList();
     }
 
+    @Override
+    public List<OreTransport> getAllWithSecurityDispatcherStatusNotSpecified() {
+        return repository.findAll().stream()
+                .filter(t -> "Not Specified".equals(t.getSecurityDispatcherStatus()))
+                .toList();
+    }
+
+    @Override
+    public ResponseEntity<String> updateSecurityDispatcherStatusToDispatched(String id, Principal principal) {
+        Optional<OreTransport> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            OreTransport transport = existing.get();
+            if (!"Not Specified".equals(transport.getSecurityDispatcherStatus())) {
+                return ResponseEntity.badRequest().body("Status is not 'Not Specified'");
+            }
+            transport.setSecurityDispatcherStatus("Dispatched");
+            transport.setUpdatedBy(principal != null ? principal.getName() : "system");
+            transport.setUpdatedDate(LocalDateTime.now());
+            repository.save(transport);
+            return ResponseEntity.ok("SecurityDispatcherStatus updated to Dispatched");
+        }
+        return ResponseEntity.status(404).body("OreTransport not found");
+    }
+
+    @Override
+    public List<OreTransport> getAllWithSecurityDispatcherStatusDispatched() {
+        return repository.findAll().stream()
+                .filter(t -> "Dispatched".equals(t.getSecurityDispatcherStatus()))
+                .toList();
+    }
+
+    @Override
+    public ResponseEntity<String> updateSecurityDispatcherStatusToReceived(String id, Principal principal) {
+        Optional<OreTransport> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            OreTransport transport = existing.get();
+            if (!"Dispatched".equals(transport.getSecurityDispatcherStatus())) {
+                return ResponseEntity.badRequest().body("Status is not 'Dispatched'");
+            }
+            transport.setSecurityDispatcherStatus("Received");
+            transport.setUpdatedBy(principal != null ? principal.getName() : "system");
+            transport.setUpdatedDate(LocalDateTime.now());
+            repository.save(transport);
+            return ResponseEntity.ok("SecurityDispatcherStatus updated to Received");
+        }
+        return ResponseEntity.status(404).body("OreTransport not found");
+    }
+
+    @Override
+    public List<OreTransport> getAllWithSecurityDispatcherStatusReceived() {
+        return repository.findAll().stream()
+                .filter(t -> "Received".equals(t.getSecurityDispatcherStatus()))
+                .toList();
+    }
+
     public ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver,
             String transportStatus, String selectedTransport, String transportReason, String location,
             Principal principal) {
@@ -128,6 +182,7 @@ public class OreTransportServiceImpl implements OreTransportService {
         oreTransportDTO.setDedicationReason("Not specified");
         oreTransport.setNewnumberOfBags(0);
         oreTransport.setNewWeight(0);
+        oreTransport.setSecurityDispatcherStatus("Not Specified");
         oreTransport.setOreUniqueId(generateRegistrationNumber());
         oreTransport.setCreatedBy(principal != null ? principal.getName() : "system");
         oreTransport.setCreatedDate(LocalDateTime.now());

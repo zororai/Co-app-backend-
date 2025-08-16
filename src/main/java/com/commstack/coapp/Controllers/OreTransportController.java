@@ -1,3 +1,4 @@
+// ...existing code...
 
 package com.commstack.coapp.Controllers;
 
@@ -70,5 +71,32 @@ public class OreTransportController {
     @PutMapping("/{id}/apply-tax")
     public ResponseEntity<OreTransport> applyTaxAndDeduct(@PathVariable String id, Principal principal) {
         return service.applyTaxAndDeduct(id, principal);
+    }
+
+    @GetMapping("/security-dispatcher/not-specified")
+    public List<OreTransport> getAllWithSecurityDispatcherStatusNotSpecified() {
+        return service.getAllWithSecurityDispatcherStatusNotSpecified();
+    }
+
+    @PutMapping("/{id}/security-dispatcher/dispatched")
+    public ResponseEntity<String> updateSecurityDispatcherStatusToDispatched(@PathVariable String id,
+            Principal principal) {
+        return service.updateSecurityDispatcherStatusToDispatched(id, principal);
+    }
+
+    @GetMapping("/security-dispatcher/dispatched")
+    public List<OreTransport> getAllWithSecurityDispatcherStatusDispatched() {
+        return service.getAllWithSecurityDispatcherStatusDispatched();
+    }
+
+    @PutMapping("/{id}/security-dispatcher/received")
+    public ResponseEntity<String> updateSecurityDispatcherStatusToReceived(@PathVariable String id,
+            Principal principal) {
+        return service.updateSecurityDispatcherStatusToReceived(id, principal);
+    }
+
+    @GetMapping("/security-dispatcher/received")
+    public List<OreTransport> getAllWithSecurityDispatcherStatusReceived() {
+        return service.getAllWithSecurityDispatcherStatusReceived();
     }
 }

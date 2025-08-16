@@ -20,6 +20,16 @@ public interface OreTransportService {
 
     OreTransport getById(String id);
 
+    List<OreTransport> getAllWithSecurityDispatcherStatusNotSpecified();
+
+    ResponseEntity<String> updateSecurityDispatcherStatusToDispatched(String id, java.security.Principal principal);
+
+    List<OreTransport> getAllWithSecurityDispatcherStatusDispatched();
+
+    ResponseEntity<String> updateSecurityDispatcherStatusToReceived(String id, java.security.Principal principal);
+
+    List<OreTransport> getAllWithSecurityDispatcherStatusReceived();
+
     ResponseEntity<String> update(String id, OreTransport oreTransport, java.security.Principal principal);
 
     ResponseEntity<String> delete(String id, java.security.Principal principal);
