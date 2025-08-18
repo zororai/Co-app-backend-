@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Mill {
     private String millid;
+    private String millName;
     private String millType;
     private String location;
 }

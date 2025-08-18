@@ -37,8 +37,9 @@ public class OreTransportController {
     private final OreTransportService service;
 
     @PutMapping("/{id}/mills/unknown")
-    public ResponseEntity<OreTransport> setMillsToUnknown(@PathVariable String id, Principal principal) {
-        return service.setMillsToUnknown(id, principal);
+    public ResponseEntity<OreTransport> setMillsToUnknown(@PathVariable String id, String millid, String millName,
+            String millType, String location, Principal principal) {
+        return service.setMillsToUnknown(id, millid, millName, millType, location, principal);
     }
 
     @PostMapping("/create")

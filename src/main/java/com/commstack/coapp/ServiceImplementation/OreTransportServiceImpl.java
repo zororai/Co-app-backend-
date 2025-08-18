@@ -1,3 +1,4 @@
+
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.CompanyRegistration;
@@ -25,19 +26,43 @@ import java.util.Optional;
 @Service
 public class OreTransportServiceImpl implements OreTransportService {
 
+    @Autowired
+    private com.commstack.coapp.Repositories.MillOnboardingRepository millOnboardingRepository;
+
     // Update mills to a single 'Unknown' mill for a given OreTransport id
-    public ResponseEntity<OreTransport> setMillsToUnknown(String id, Principal principal) {
+    public ResponseEntity<OreTransport> setMillsToUnknown(String id, String millid, String millName, String millType,
+            String location, Principal principal) {
         Optional<OreTransport> existing = repository.findById(id);
         if (existing.isPresent()) {
             OreTransport oreTransport = existing.get();
-            List<Mill> mills = new ArrayList<>();
-            mills.add(Mill.builder()
-                    .millid("Unknown")
-                    .millType("Unknown")
-                    .location("Unknown")
-                    .build());
-            oreTransport.setMills(mills);
-            repository.save(oreTransport);
+
+            // Only update mills if the current list contains only a mill with millid
+            // 'Unknown'
+            List<Mill> currentMills = oreTransport.getMills();
+            boolean onlyUnknown = currentMills != null && currentMills.size() == 1
+                    && "Unknown".equals(currentMills.get(0).getMillid());
+            if (onlyUnknown) {
+                oreTransport.setProcessStatus("In Progress");
+                List<Mill> millsList = new ArrayList<>();
+                millsList.add(Mill.builder()
+                        .millid(millid)
+                        .millName(millName)
+                        .millType(millType)
+                        .location(location)
+                        .build());
+                oreTransport.setMills(millsList);
+                repository.save(oreTransport);
+            }
+
+            // Set related MillOnboarding to inactive (activeStatus=false)
+            Optional<com.commstack.coapp.Models.MillOnboarding> millOnboardingOpt = millOnboardingRepository
+                    .findById(millid);
+            if (millOnboardingOpt.isPresent()) {
+                com.commstack.coapp.Models.MillOnboarding millOnboarding = millOnboardingOpt.get();
+                millOnboarding.setActiveStatus(false);
+                millOnboardingRepository.save(millOnboarding);
+            }
+
             UserAuditTrail audit = UserAuditTrail.builder()
                     .userId(id)
                     .action("SET_MILLS_UNKNOWN")
@@ -219,6 +244,7 @@ public class OreTransportServiceImpl implements OreTransportService {
 
         mills.add(Mill.builder()
                 .millid("Unknown")
+                .millName("Unknown")
                 .millType("Unknown")
                 .location("Unknown")
                 .build());
