@@ -18,6 +18,10 @@ public interface MillOnboardingService {
 
     ResponseEntity<MillOnboarding> approve(String id, Principal principal);
 
+    ResponseEntity<MillOnboarding> deactivate(String id, Principal principal);
+
+    ResponseEntity<MillOnboarding> activate(String id, Principal principal);
+
     ResponseEntity<MillOnboarding> reject(String id, String reason, Principal principal);
 
     ResponseEntity<MillOnboarding> pushBack(String id, String reason, Principal principal);

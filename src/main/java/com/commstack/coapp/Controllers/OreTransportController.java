@@ -1,4 +1,3 @@
-// ...existing code...
 
 package com.commstack.coapp.Controllers;
 
@@ -36,6 +35,11 @@ public class OreTransportController {
     }
 
     private final OreTransportService service;
+
+    @PutMapping("/{id}/mills/unknown")
+    public ResponseEntity<OreTransport> setMillsToUnknown(@PathVariable String id, Principal principal) {
+        return service.setMillsToUnknown(id, principal);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<OreTransport> create(@RequestBody OreTransportDTO oreTransportDTO, Principal principal) {

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface OreTransportService {
+    ResponseEntity<OreTransport> setMillsToUnknown(String id, java.security.Principal principal);
 
     ResponseEntity<OreTransport> applyTaxAndDeduct(String id, java.security.Principal principal);
 

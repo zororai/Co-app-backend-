@@ -18,8 +18,19 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer Authentication")
 
 public class MillOnboardingController {
+
     @Autowired
     private MillOnboardingService service;
+
+    @GetMapping("/activated")
+    public List<MillOnboarding> getAllActivated() {
+        return service.getAll().stream().filter(MillOnboarding::isActiveStatus).toList();
+    }
+
+    @GetMapping("/deactivated")
+    public List<MillOnboarding> getAllDeactivated() {
+        return service.getAll().stream().filter(m -> !m.isActiveStatus()).toList();
+    }
 
     @PostMapping("/create")
     public ResponseEntity<MillOnboarding> create(@RequestBody MillOnboarding millOnboarding, Principal principal) {
@@ -40,6 +51,16 @@ public class MillOnboardingController {
     public ResponseEntity<MillOnboarding> update(@PathVariable String id, @RequestBody MillOnboarding millOnboarding,
             Principal principal) {
         return service.update(id, millOnboarding, principal);
+    }
+
+    @PutMapping("/{id}/deactivate")
+    public ResponseEntity<MillOnboarding> deactivate(@PathVariable String id, Principal principal) {
+        return service.deactivate(id, principal);
+    }
+
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<MillOnboarding> activate(@PathVariable String id, Principal principal) {
+        return service.activate(id, principal);
     }
 
     @DeleteMapping("/{id}")

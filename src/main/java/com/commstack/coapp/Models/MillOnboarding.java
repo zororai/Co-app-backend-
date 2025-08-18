@@ -20,6 +20,7 @@ public class MillOnboarding {
     private String millLocation;
     private String millType;
     private String owner;
+    private boolean activeStatus;
     private String idNumber;
     private String address;
     private String picture;

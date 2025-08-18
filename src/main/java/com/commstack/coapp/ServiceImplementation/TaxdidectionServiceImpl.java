@@ -1,10 +1,13 @@
 package com.commstack.coapp.ServiceImplementation;
 
+import com.commstack.coapp.Repositories.TaxdidectionRepository;
+
 import com.commstack.coapp.Models.UserAuditTrail;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import com.commstack.coapp.Models.SHEActivity;
 import com.commstack.coapp.Models.Taxdidection;
 import com.commstack.coapp.Service.TaxdidectionService;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +19,12 @@ import java.util.*;
 @Service
 public class TaxdidectionServiceImpl implements TaxdidectionService {
 
+    @Autowired
+    private TaxdidectionRepository taxdidectionRepository;
+
     public List<Taxdidection> getAllApproved() {
         List<Taxdidection> result = new ArrayList<>();
-        for (Taxdidection t : store.values()) {
+        for (Taxdidection t : taxdidectionRepository.findAll()) {
             if ("APPROVED".equalsIgnoreCase(t.getStatus())) {
                 result.add(t);
             }
@@ -28,7 +34,7 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
 
     public List<Taxdidection> getAllRejected() {
         List<Taxdidection> result = new ArrayList<>();
-        for (Taxdidection t : store.values()) {
+        for (Taxdidection t : taxdidectionRepository.findAll()) {
             if ("REJECTED".equalsIgnoreCase(t.getStatus())) {
                 result.add(t);
             }
@@ -38,7 +44,7 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
 
     public List<Taxdidection> getAllPushedBack() {
         List<Taxdidection> result = new ArrayList<>();
-        for (Taxdidection t : store.values()) {
+        for (Taxdidection t : taxdidectionRepository.findAll()) {
             if ("PUSHED_BACK".equalsIgnoreCase(t.getStatus())) {
                 result.add(t);
             }
@@ -48,7 +54,6 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-    private final Map<String, Taxdidection> store = new HashMap<>();
 
     @Override
     public ResponseEntity<Taxdidection> create(Taxdidection taxdidection, Principal principal) {
@@ -57,7 +62,7 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
         taxdidection.setStatus("PENDING");
         taxdidection.setReason("");
 
-        store.put(id, taxdidection);
+        Taxdidection saved = taxdidectionRepository.save(taxdidection);
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(id)
                 .action("CREATED")
@@ -71,21 +76,21 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
 
     @Override
     public List<Taxdidection> getAll() {
-        return new ArrayList<>(store.values());
+        return taxdidectionRepository.findAll();
     }
 
     @Override
     public Taxdidection getById(String id) {
-        return store.get(id);
+        return taxdidectionRepository.findById(id).orElse(null);
     }
 
     @Override
     public ResponseEntity<Taxdidection> update(String id, Taxdidection taxdidection, Principal principal) {
-        if (!store.containsKey(id)) {
+        if (!taxdidectionRepository.existsById(id)) {
             return ResponseEntity.status(404).body(null);
         }
         taxdidection.setId(id);
-        store.put(id, taxdidection);
+        Taxdidection updated = taxdidectionRepository.save(taxdidection);
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(id)
                 .action("UPDATED")
@@ -94,13 +99,14 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
                 .dateTime(java.time.LocalDateTime.now())
                 .build();
         mongoTemplate.save(audit, "taxdidection_audit_trail");
-        return ResponseEntity.ok(taxdidection);
+        return ResponseEntity.ok(updated);
     }
 
     @Override
     public ResponseEntity<Taxdidection> delete(String id, Principal principal) {
-        Taxdidection removed = store.remove(id);
-        if (removed != null) {
+        Optional<Taxdidection> removed = taxdidectionRepository.findById(id);
+        if (removed.isPresent()) {
+            taxdidectionRepository.deleteById(id);
             UserAuditTrail audit = UserAuditTrail.builder()
                     .userId(id)
                     .action("DELETED")
@@ -109,18 +115,20 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
                     .dateTime(java.time.LocalDateTime.now())
                     .build();
             mongoTemplate.save(audit, "taxdidection_audit_trail");
-            return ResponseEntity.ok(removed);
+            return ResponseEntity.ok(removed.get());
         }
         return ResponseEntity.status(404).body(null);
     }
 
     @Override
     public ResponseEntity<Taxdidection> approve(String id, Principal principal) {
-        Taxdidection tax = store.get(id);
-        if (tax == null) {
+        Optional<Taxdidection> optionalTax = taxdidectionRepository.findById(id);
+        if (!optionalTax.isPresent()) {
             return ResponseEntity.status(404).body(null);
         }
+        Taxdidection tax = optionalTax.get();
         tax.setStatus("APPROVED");
+        taxdidectionRepository.save(tax);
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(id)
                 .action("APPROVED")
@@ -134,12 +142,14 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
 
     @Override
     public ResponseEntity<Taxdidection> reject(String id, String reason, Principal principal) {
-        Taxdidection tax = store.get(id);
-        if (tax == null) {
+        Optional<Taxdidection> optionalTax = taxdidectionRepository.findById(id);
+        if (!optionalTax.isPresent()) {
             return ResponseEntity.status(404).body(null);
         }
+        Taxdidection tax = optionalTax.get();
         tax.setStatus("REJECTED");
         tax.setReason(reason);
+        taxdidectionRepository.save(tax);
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(id)
                 .action("REJECTED")
@@ -153,12 +163,14 @@ public class TaxdidectionServiceImpl implements TaxdidectionService {
 
     @Override
     public ResponseEntity<Taxdidection> pushBack(String id, String reason, Principal principal) {
-        Taxdidection tax = store.get(id);
-        if (tax == null) {
+        Optional<Taxdidection> optionalTax = taxdidectionRepository.findById(id);
+        if (!optionalTax.isPresent()) {
             return ResponseEntity.status(404).body(null);
         }
+        Taxdidection tax = optionalTax.get();
         tax.setStatus("PUSHED_BACK");
         tax.setReason(reason);
+        taxdidectionRepository.save(tax);
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(id)
                 .action("PUSHED_BACK")

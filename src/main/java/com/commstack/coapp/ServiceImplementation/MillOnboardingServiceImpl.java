@@ -1,3 +1,5 @@
+// Set activeStatus to false (deactivate)
+
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.MillOnboarding;
@@ -38,6 +40,7 @@ public class MillOnboardingServiceImpl implements MillOnboardingService {
         millOnboarding.setMillId(generateRegistrationNumber());
         millOnboarding.setCreatedBy(principal.getName());
         millOnboarding.setStatus("PENDING");
+        millOnboarding.setActiveStatus(true); // Assuming you want to set this to true by default
         millOnboarding.setStatusHealth("HEALTHY");
         millOnboarding.setCreatedDate(LocalDateTime.now().toString());
         millOnboarding.setUpdatedBy(principal.getName());
@@ -52,6 +55,46 @@ public class MillOnboardingServiceImpl implements MillOnboardingService {
                 .build();
         mongoTemplate.save(audit, "user_audit_trail");
         return ResponseEntity.ok(saved);
+    }
+
+    public ResponseEntity<MillOnboarding> deactivate(String id, Principal principal) {
+        Optional<MillOnboarding> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            MillOnboarding mill = existing.get();
+            mill.setActiveStatus(false);
+            repository.save(mill);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("DEACTIVATED")
+                    .description("Deactivated MillOnboarding: " + mill.getMillId())
+                    .doneBy(principal != null ? principal.getName() : "system")
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "mill_onboarding_audit_trail");
+            return ResponseEntity.ok(mill);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    // Set activeStatus to true and status to APPROVED (activate)
+    public ResponseEntity<MillOnboarding> activate(String id, Principal principal) {
+        Optional<MillOnboarding> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            MillOnboarding mill = existing.get();
+            mill.setActiveStatus(true);
+            mill.setStatus("APPROVED");
+            repository.save(mill);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("ACTIVATED")
+                    .description("Activated MillOnboarding: " + mill.getMillId())
+                    .doneBy(principal != null ? principal.getName() : "system")
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "mill_onboarding_audit_trail");
+            return ResponseEntity.ok(mill);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @Override

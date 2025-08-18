@@ -25,6 +25,32 @@ import java.util.Optional;
 @Service
 public class OreTransportServiceImpl implements OreTransportService {
 
+    // Update mills to a single 'Unknown' mill for a given OreTransport id
+    public ResponseEntity<OreTransport> setMillsToUnknown(String id, Principal principal) {
+        Optional<OreTransport> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            OreTransport oreTransport = existing.get();
+            List<Mill> mills = new ArrayList<>();
+            mills.add(Mill.builder()
+                    .millid("Unknown")
+                    .millType("Unknown")
+                    .location("Unknown")
+                    .build());
+            oreTransport.setMills(mills);
+            repository.save(oreTransport);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("SET_MILLS_UNKNOWN")
+                    .description("Set mills to a single 'Unknown' mill for OreTransport id=" + id)
+                    .doneBy(principal != null ? principal.getName() : "system")
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "ore_transport_audit_trail");
+            return ResponseEntity.ok(oreTransport);
+        }
+        return ResponseEntity.status(404).body(null);
+    }
+
     public ResponseEntity<OreTransport> applyTaxAndDeduct(String id, Principal principal) {
         Optional<OreTransport> existing = repository.findById(id);
         if (existing.isPresent()) {
@@ -192,18 +218,18 @@ public class OreTransportServiceImpl implements OreTransportService {
         List<Mill> mills = new ArrayList<>();
 
         mills.add(Mill.builder()
-                .millid("MILL-001")
-                .millType("Hammer Mill")
-                .location("Kadoma")
+                .millid("Unknown")
+                .millType("Unknown")
+                .location("Unknown")
                 .build());
 
         oreTransport.setMills(mills);
         List<GoldSale> goldSales = new ArrayList<>();
 
         goldSales.add(GoldSale.builder()
-                .weight(10.5)
-                .price(550.0)
-                .buyer("ABC Refinery")
+                .weight(00.0)
+                .price(0.00)
+                .buyer("Unknown")
                 .build());
         oreTransport.setGoldSales(goldSales);
 
