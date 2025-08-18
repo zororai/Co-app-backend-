@@ -41,7 +41,7 @@ public class BlastingEquipmentServiceImpl implements BlastingEquipmentService {
                 .doneBy(principal.getName())
                 .dateTime(LocalDateTime.now())
                 .build();
-        mongoTemplate.save(audit, "blasting_equipment_audit_trail");
+        mongoTemplate.save(audit, "user_audit_trail");
 
         return ResponseEntity.ok("Blasting equipment created successfully");
     }

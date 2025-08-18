@@ -31,6 +31,8 @@ public class OreTransport {
     private String selectedTransportdriver;
     private String selectedTransport;
     private List<Tax> tax;
+    private List<Mill> mills;
+    private List<GoldSale> goldSales;
     private String transportReason;
     private String securityDispatcherStatus;
     private String processStatus;

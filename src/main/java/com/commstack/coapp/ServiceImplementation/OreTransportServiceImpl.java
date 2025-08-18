@@ -1,6 +1,8 @@
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.CompanyRegistration;
+import com.commstack.coapp.Models.GoldSale;
+import com.commstack.coapp.Models.Mill;
 import com.commstack.coapp.Models.MinerAuditTrail;
 import com.commstack.coapp.Models.OreTransport;
 import com.commstack.coapp.Models.OreTransportAuditTrail;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -182,6 +185,29 @@ public class OreTransportServiceImpl implements OreTransportService {
         oreTransportDTO.setDedicationReason("Not specified");
         oreTransport.setNewnumberOfBags(0);
         oreTransport.setNewWeight(0);
+        oreTransport.setGoldSales(new ArrayList<>());
+        oreTransport.setMills(new ArrayList<>());
+
+        // --- Replace above 2 lines with this ---
+        List<Mill> mills = new ArrayList<>();
+
+        mills.add(Mill.builder()
+                .millid("MILL-001")
+                .millType("Hammer Mill")
+                .location("Kadoma")
+                .build());
+
+        oreTransport.setMills(mills);
+        List<GoldSale> goldSales = new ArrayList<>();
+
+        goldSales.add(GoldSale.builder()
+                .weight(10.5)
+                .price(550.0)
+                .buyer("ABC Refinery")
+                .build());
+        oreTransport.setGoldSales(goldSales);
+
+        oreTransport.setGoldSales(goldSales);
         oreTransport.setSecurityDispatcherStatus("Not Specified");
         oreTransport.setOreUniqueId(generateRegistrationNumber());
         oreTransport.setCreatedBy(principal != null ? principal.getName() : "system");
