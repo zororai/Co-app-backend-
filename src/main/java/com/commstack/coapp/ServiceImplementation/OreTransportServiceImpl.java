@@ -27,9 +27,38 @@ import java.util.Optional;
 @Service
 public class OreTransportServiceImpl implements OreTransportService {
 
+    // Update the first GoldSale in OreTransport by oreTransportId
+    public ResponseEntity<OreTransport> updateGoldSale(String oreTransportId, double weight, double price,
+            String buyer) {
+        Optional<OreTransport> existing = repository.findById(oreTransportId);
+        if (existing.isPresent()) {
+            OreTransport oreTransport = existing.get();
+            List<GoldSale> goldSales = oreTransport.getGoldSales();
+            if (goldSales != null && !goldSales.isEmpty()) {
+                GoldSale goldSale = goldSales.get(0);
+                goldSale.setWeight(weight);
+                goldSale.setPrice(price);
+                goldSale.setBuyer(buyer);
+                oreTransport.setGoldSales(goldSales);
+                repository.save(oreTransport);
+                // Audit trail
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(oreTransportId)
+                        .action("UPDATE_GOLD_SALE")
+                        .description("Updated gold sale for OreTransport id=" + oreTransportId)
+                        .doneBy("system")
+                        .dateTime(java.time.LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "ore_transport_audit_trail");
+                return ResponseEntity.ok(oreTransport);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     // Update OreSample by id, only if its reason, result, and status are the
     // default values
-    public ResponseEntity<OreTransport> updateSampleIfDefault(String oreTransportId, String sampleId, String newReason,
+    public ResponseEntity<OreTransport> updateSampleIfDefault(String oreTransportId, String newReason,
             double newResult, String newStatus) {
         Optional<OreTransport> existing = repository.findById(oreTransportId);
         if (existing.isPresent()) {
@@ -37,17 +66,21 @@ public class OreTransportServiceImpl implements OreTransportService {
             List<OreSample> oreSamples = oreTransport.getOreSample();
             if (oreSamples != null) {
                 for (OreSample sample : oreSamples) {
-                    if (sampleId.equals(sample.getId())
-                            && "Unknown".equals(sample.getReason())
+                    if ("Unknown".equals(sample.getReason())
                             && sample.getResult() == 0.0
-                            && "Pending for results".equals(sample.getStatus())) {
+                            && "ending for results".equals(sample.getStatus())) {
                         sample.setReason(newReason);
                         sample.setResult(newResult);
                         sample.setStatus(newStatus);
+                        if (newStatus.equals("Rejected")) {
+                            oreTransport.setProcessStatus("Rejected");
+                        } else {
+                            oreTransport.setProcessStatus("Approved");
+                        }
                         break;
                     }
                 }
-                oreTransport.setOreSamples(oreSamples);
+                oreTransport.setOreSample(oreSamples);
                 repository.save(oreTransport);
                 return ResponseEntity.ok(oreTransport);
             }
@@ -58,7 +91,7 @@ public class OreTransportServiceImpl implements OreTransportService {
     // Collect sample: update the first OreSample with sampleType 'Unknown' in the
     // OreTransport's oreSamples list
     @Override
-    public ResponseEntity<OreTransport> collectSample(String oreTransportId, String sampleId, String sampleType,
+    public ResponseEntity<OreTransport> collectSample(String oreTransportId, String sampleType,
             String sampleWeight, String status, String sampleSize) {
         Optional<OreTransport> existing = repository.findById(oreTransportId);
         if (existing.isPresent()) {
@@ -67,7 +100,7 @@ public class OreTransportServiceImpl implements OreTransportService {
             if (oreSamples != null) {
                 for (OreSample sample : oreSamples) {
                     if ("Unknown".equals(sample.getSampleType())) {
-                        sample.setId(sampleId);
+
                         sample.setSampleType(sampleType);
                         sample.setSampleWeight(sampleWeight);
                         sample.setStatus(status);
@@ -77,7 +110,7 @@ public class OreTransportServiceImpl implements OreTransportService {
                         break;
                     }
                 }
-                oreTransport.setOreSamples(oreSamples);
+                oreTransport.setOreSample(oreSamples);
                 repository.save(oreTransport);
                 // Add audit trail for sample collection
                 UserAuditTrail audit = UserAuditTrail.builder()
@@ -306,7 +339,7 @@ public class OreTransportServiceImpl implements OreTransportService {
         oreTransport.setNewWeight(0);
         oreTransport.setGoldSales(new ArrayList<>());
         oreTransport.setMills(new ArrayList<>());
-        oreTransport.setOreSamples(new ArrayList<>());
+        oreTransport.setOreSample(new ArrayList<>());
 
         // --- Replace above 2 lines with this ---
         List<Mill> mills = new ArrayList<>();
@@ -327,13 +360,13 @@ public class OreTransportServiceImpl implements OreTransportService {
 
                 .sampleType("Unknown")
                 .sampleWeight("Unknown")
-                .status("Not Yet Collected")
+                .status("Unknown")
                 .sampleSize("Unknown")
                 .result(0.0)
                 .reason("Unknown")
                 .build());
 
-        oreTransport.setOreSamples(oreSamples);
+        oreTransport.setOreSample(oreSamples);
 
         List<GoldSale> goldSales = new ArrayList<>();
 

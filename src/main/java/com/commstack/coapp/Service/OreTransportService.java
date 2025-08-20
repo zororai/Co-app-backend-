@@ -8,7 +8,9 @@ import java.security.Principal;
 import java.util.List;
 
 public interface OreTransportService {
-        ResponseEntity<OreTransport> updateSampleIfDefault(String oreTransportId, String sampleId, String newReason,
+        ResponseEntity<OreTransport> updateGoldSale(String oreTransportId, double weight, double price, String buyer);
+
+        ResponseEntity<OreTransport> updateSampleIfDefault(String oreTransportId, String newReason,
                         double newResult, String newStatus);
 
         ResponseEntity<OreTransport> setMillsToUnknown(String id, String millid, String millName, String millType,
@@ -41,6 +43,6 @@ public interface OreTransportService {
 
         ResponseEntity<String> delete(String id, java.security.Principal principal);
 
-        ResponseEntity<OreTransport> collectSample(String oreTransportId, String sampleId, String sampleType,
+        ResponseEntity<OreTransport> collectSample(String oreTransportId, String sampleType,
                         String sampleWeight, String status, String sampleSize);
 }

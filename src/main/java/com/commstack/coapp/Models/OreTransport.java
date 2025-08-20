@@ -45,8 +45,5 @@ public class OreTransport {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
-    public void setOreSamples(List<OreSample> oreSamples) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setOreSamples'");
-    }
+
 }
