@@ -5,6 +5,7 @@ import com.commstack.coapp.Models.CompanyRegistration;
 import com.commstack.coapp.Models.GoldSale;
 import com.commstack.coapp.Models.Mill;
 import com.commstack.coapp.Models.MinerAuditTrail;
+import com.commstack.coapp.Models.OreSample;
 import com.commstack.coapp.Models.OreTransport;
 import com.commstack.coapp.Models.OreTransportAuditTrail;
 import com.commstack.coapp.Models.Regminer;
@@ -25,6 +26,73 @@ import java.util.Optional;
 
 @Service
 public class OreTransportServiceImpl implements OreTransportService {
+
+    // Update OreSample by id, only if its reason, result, and status are the
+    // default values
+    public ResponseEntity<OreTransport> updateSampleIfDefault(String oreTransportId, String sampleId, String newReason,
+            double newResult, String newStatus) {
+        Optional<OreTransport> existing = repository.findById(oreTransportId);
+        if (existing.isPresent()) {
+            OreTransport oreTransport = existing.get();
+            List<OreSample> oreSamples = oreTransport.getOreSample();
+            if (oreSamples != null) {
+                for (OreSample sample : oreSamples) {
+                    if (sampleId.equals(sample.getId())
+                            && "Unknown".equals(sample.getReason())
+                            && sample.getResult() == 0.0
+                            && "Pending for results".equals(sample.getStatus())) {
+                        sample.setReason(newReason);
+                        sample.setResult(newResult);
+                        sample.setStatus(newStatus);
+                        break;
+                    }
+                }
+                oreTransport.setOreSamples(oreSamples);
+                repository.save(oreTransport);
+                return ResponseEntity.ok(oreTransport);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    // Collect sample: update the first OreSample with sampleType 'Unknown' in the
+    // OreTransport's oreSamples list
+    @Override
+    public ResponseEntity<OreTransport> collectSample(String oreTransportId, String sampleId, String sampleType,
+            String sampleWeight, String status, String sampleSize) {
+        Optional<OreTransport> existing = repository.findById(oreTransportId);
+        if (existing.isPresent()) {
+            OreTransport oreTransport = existing.get();
+            List<OreSample> oreSamples = oreTransport.getOreSample();
+            if (oreSamples != null) {
+                for (OreSample sample : oreSamples) {
+                    if ("Unknown".equals(sample.getSampleType())) {
+                        sample.setId(sampleId);
+                        sample.setSampleType(sampleType);
+                        sample.setSampleWeight(sampleWeight);
+                        sample.setStatus(status);
+                        sample.setSampleSize(sampleSize);
+                        sample.setReason("Unknown");
+                        sample.setResult(0.0);
+                        break;
+                    }
+                }
+                oreTransport.setOreSamples(oreSamples);
+                repository.save(oreTransport);
+                // Add audit trail for sample collection
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(oreTransportId)
+                        .action("COLLECT_SAMPLE")
+                        .description("Collected ore sample for OreTransport id=" + oreTransportId)
+                        .doneBy("system")
+                        .dateTime(java.time.LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "ore_transport_audit_trail");
+                return ResponseEntity.ok(oreTransport);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
 
     @Autowired
     private com.commstack.coapp.Repositories.MillOnboardingRepository millOnboardingRepository;
@@ -238,6 +306,7 @@ public class OreTransportServiceImpl implements OreTransportService {
         oreTransport.setNewWeight(0);
         oreTransport.setGoldSales(new ArrayList<>());
         oreTransport.setMills(new ArrayList<>());
+        oreTransport.setOreSamples(new ArrayList<>());
 
         // --- Replace above 2 lines with this ---
         List<Mill> mills = new ArrayList<>();
@@ -250,6 +319,22 @@ public class OreTransportServiceImpl implements OreTransportService {
                 .build());
 
         oreTransport.setMills(mills);
+
+        // --- Replace above 2 lines with this --
+        List<OreSample> oreSamples = new ArrayList<>();
+
+        oreSamples.add(OreSample.builder()
+
+                .sampleType("Unknown")
+                .sampleWeight("Unknown")
+                .status("Not Yet Collected")
+                .sampleSize("Unknown")
+                .result(0.0)
+                .reason("Unknown")
+                .build());
+
+        oreTransport.setOreSamples(oreSamples);
+
         List<GoldSale> goldSales = new ArrayList<>();
 
         goldSales.add(GoldSale.builder()

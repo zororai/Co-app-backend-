@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -26,10 +27,15 @@ public class ShaftAssignment {
     private LocalDate startContractDate;
     private LocalDate endContractDate;
     private String status;
+    private List<Loan> loans;
     private String reason;
     private String createdBy;
     private LocalDate createdAt;
     private String updatedBy;
     private LocalDate updatedAt;
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
+    }
 
 }

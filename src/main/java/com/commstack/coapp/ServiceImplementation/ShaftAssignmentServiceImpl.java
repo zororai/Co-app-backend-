@@ -6,6 +6,8 @@ import com.commstack.coapp.Models.Section;
 
 import com.commstack.coapp.Repositories.CompanyRegistrationRepository;
 import com.commstack.coapp.Repositories.RegMinerRepository;
+import com.commstack.coapp.Models.Loan;
+import com.commstack.coapp.Models.Mill;
 import com.commstack.coapp.Models.Regminer;
 import com.commstack.coapp.Models.UserAuditTrail;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -18,6 +20,8 @@ import com.commstack.coapp.Service.ShaftAssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import com.commstack.coapp.Models.Loan;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,6 +107,21 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
         shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setStatus("PENDING"); // Assuming reason is not set during creation
         ShaftAssignment saved = repository.save(shaftAssignment);
+        shaftAssignment.setId(saved.getId());
+        shaftAssignment.setLoans(new ArrayList<Loan>());
+
+        // --- Replace above 2 lines with this ---
+        List<Loan> loans = new ArrayList<>();
+
+        loans.add(Loan.builder()
+                .loanName("Not Yet Specified")
+                .paymentMethod("Unknown")
+                .amountOrGrams(0)
+                .purpose("Unknown")
+                .status("Unknown")
+                .reason("Unknown")
+                .build());
+
         // Update shaftnumber in Regminer or CompanyRegistration if minerId matches
         boolean updated = false;
         if (saved.getMinerId() != null && !saved.getMinerId().isEmpty()) {

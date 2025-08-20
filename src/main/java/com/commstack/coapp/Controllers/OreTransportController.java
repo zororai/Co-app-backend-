@@ -21,6 +21,27 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OreTransportController {
 
+    @PutMapping("/{id}/update-sample-if-default")
+    public ResponseEntity<OreTransport> updateSampleIfDefault(
+            @PathVariable("id") String oreTransportId,
+            @RequestParam String sampleId,
+            @RequestParam String newReason,
+            @RequestParam double newResult,
+            @RequestParam String newStatus) {
+        return service.updateSampleIfDefault(oreTransportId, sampleId, newReason, newResult, newStatus);
+    }
+
+    @PutMapping("/{id}/collect-sample")
+    public ResponseEntity<OreTransport> collectSample(
+            @PathVariable("id") String oreTransportId,
+            @RequestParam String sampleId,
+            @RequestParam String sampleType,
+            @RequestParam String sampleWeight,
+            @RequestParam String status,
+            @RequestParam String sampleSize) {
+        return service.collectSample(oreTransportId, sampleId, sampleType, sampleWeight, status, sampleSize);
+    }
+
     @PutMapping("/{id}/fields")
     public ResponseEntity<String> updateTransportFields(
             @PathVariable String id,

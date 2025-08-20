@@ -8,8 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.List;
-// ...existing code...
 import com.commstack.coapp.Models.Tax;
+import com.commstack.coapp.Models.OreSample;
 
 @Data
 @Builder
@@ -36,6 +36,7 @@ public class OreTransport {
     private String transportReason;
     private String securityDispatcherStatus;
     private String processStatus;
+    private List<OreSample> oreSample;
     private String location;
     private LocalDateTime date;
     private LocalDateTime time;
@@ -43,4 +44,9 @@ public class OreTransport {
     private String updatedBy;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+
+    public void setOreSamples(List<OreSample> oreSamples) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setOreSamples'");
+    }
 }

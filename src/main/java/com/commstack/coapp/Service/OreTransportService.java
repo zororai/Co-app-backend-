@@ -8,33 +8,39 @@ import java.security.Principal;
 import java.util.List;
 
 public interface OreTransportService {
-    ResponseEntity<OreTransport> setMillsToUnknown(String id, String millid, String millName, String millType,
-            String location, Principal principal);
+        ResponseEntity<OreTransport> updateSampleIfDefault(String oreTransportId, String sampleId, String newReason,
+                        double newResult, String newStatus);
 
-    ResponseEntity<OreTransport> applyTaxAndDeduct(String id, Principal principal);
+        ResponseEntity<OreTransport> setMillsToUnknown(String id, String millid, String millName, String millType,
+                        String location, Principal principal);
 
-    ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver, String transportStatus,
-            String selectedTransport, String transportReason, String location, Principal principal);
+        ResponseEntity<OreTransport> applyTaxAndDeduct(String id, Principal principal);
 
-    ResponseEntity<OreTransport> create(OreTransportDTO oreTransportDTO, Principal principal);
+        ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver, String transportStatus,
+                        String selectedTransport, String transportReason, String location, Principal principal);
 
-    List<OreTransport> getAllWithSelectedTransportdriverChanged();
+        ResponseEntity<OreTransport> create(OreTransportDTO oreTransportDTO, Principal principal);
 
-    List<OreTransport> getAll();
+        List<OreTransport> getAllWithSelectedTransportdriverChanged();
 
-    OreTransport getById(String id);
+        List<OreTransport> getAll();
 
-    List<OreTransport> getAllWithSecurityDispatcherStatusNotSpecified();
+        OreTransport getById(String id);
 
-    ResponseEntity<String> updateSecurityDispatcherStatusToDispatched(String id, java.security.Principal principal);
+        List<OreTransport> getAllWithSecurityDispatcherStatusNotSpecified();
 
-    List<OreTransport> getAllWithSecurityDispatcherStatusDispatched();
+        ResponseEntity<String> updateSecurityDispatcherStatusToDispatched(String id, java.security.Principal principal);
 
-    ResponseEntity<String> updateSecurityDispatcherStatusToReceived(String id, java.security.Principal principal);
+        List<OreTransport> getAllWithSecurityDispatcherStatusDispatched();
 
-    List<OreTransport> getAllWithSecurityDispatcherStatusReceived();
+        ResponseEntity<String> updateSecurityDispatcherStatusToReceived(String id, java.security.Principal principal);
 
-    ResponseEntity<String> update(String id, OreTransport oreTransport, java.security.Principal principal);
+        List<OreTransport> getAllWithSecurityDispatcherStatusReceived();
 
-    ResponseEntity<String> delete(String id, java.security.Principal principal);
+        ResponseEntity<String> update(String id, OreTransport oreTransport, java.security.Principal principal);
+
+        ResponseEntity<String> delete(String id, java.security.Principal principal);
+
+        ResponseEntity<OreTransport> collectSample(String oreTransportId, String sampleId, String sampleType,
+                        String sampleWeight, String status, String sampleSize);
 }
