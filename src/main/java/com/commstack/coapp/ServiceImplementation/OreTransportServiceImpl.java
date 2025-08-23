@@ -50,6 +50,13 @@ public class OreTransportServiceImpl implements OreTransportService {
                         .dateTime(java.time.LocalDateTime.now())
                         .build();
                 mongoTemplate.save(audit, "ore_transport_audit_trail");
+                Optional<com.commstack.coapp.Models.MillOnboarding> millOnboardingOpt = millOnboardingRepository
+                        .findById(oreTransport.getId());
+                if (millOnboardingOpt.isPresent()) {
+                    com.commstack.coapp.Models.MillOnboarding millOnboarding = millOnboardingOpt.get();
+                    millOnboarding.setActiveStatus(true);
+                    millOnboardingRepository.save(millOnboarding);
+                }
                 return ResponseEntity.ok(oreTransport);
             }
         }
