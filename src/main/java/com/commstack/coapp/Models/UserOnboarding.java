@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Data
@@ -29,6 +31,7 @@ public class UserOnboarding {
     private String position;
     private String location;
     private String role;
+    // private List<String> permissions;
     private String status;
     private String notes;
     private String reason;

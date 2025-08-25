@@ -15,6 +15,12 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @Service
 public class ProductionLoanServiceImpl implements ProductionLoanService {
 
+    public List<ProductionLoan> getAllApproved() {
+        return repository.findAll().stream()
+                .filter(loan -> "APPROVED".equalsIgnoreCase(loan.getStatus()))
+                .toList();
+    }
+
     @Autowired
     private MongoTemplate mongoTemplate;
 

@@ -12,6 +12,8 @@ public interface ProductionLoanService {
 
     ProductionLoan getById(String id);
 
+    List<ProductionLoan> getAllApproved();
+
     ResponseEntity<ProductionLoan> approve(String id, Principal principal);
 
     ResponseEntity<ProductionLoan> reject(String id, String reason, Principal principal);

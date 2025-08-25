@@ -14,6 +14,12 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @SecurityRequirement(name = "Bearer Authentication")
 public class ProductionLoanController {
+
+    @GetMapping("/approved")
+    public List<ProductionLoan> getAllApproved() {
+        return service.getAllApproved();
+    }
+
     @Autowired
     private ProductionLoanService service;
 

@@ -20,6 +20,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShaftAssignmentController {
 
+    @PutMapping("/{id}/update-loan-details")
+    public ResponseEntity<ShaftAssignment> updateLoanDetails(
+            @PathVariable("id") String shaftAssignmentId,
+            @RequestParam String loanName,
+            @RequestParam String paymentMethod,
+            @RequestParam double amountOrGrams,
+            @RequestParam String purpose,
+            @RequestParam String status,
+            @RequestParam String reason,
+            Principal principal) {
+        ShaftAssignment updated = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .updateLoanDetails(shaftAssignmentId, loanName, paymentMethod, amountOrGrams, purpose, status, reason,
+                        principal);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
+
     private final ShaftAssignmentService shaftAssignmentService;
 
     @PostMapping

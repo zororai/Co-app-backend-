@@ -28,6 +28,37 @@ import java.util.Optional;
 @Service
 public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
 
+    public ShaftAssignment updateLoanDetails(String shaftAssignmentId, String loanName, String paymentMethod,
+            double amountOrGrams, String purpose, String status, String reason, Principal principal) {
+        Optional<ShaftAssignment> result = repository.findById(shaftAssignmentId);
+        if (result.isPresent()) {
+            ShaftAssignment shaftAssignment = result.get();
+            List<Loan> loans = new ArrayList<>();
+            loans.add(Loan.builder()
+                    .loanName(loanName)
+                    .paymentMethod(paymentMethod)
+                    .amountOrGrams(amountOrGrams)
+                    .purpose(purpose)
+                    .status(status)
+                    .reason(reason)
+                    .build());
+            shaftAssignment.setLoans(loans);
+            shaftAssignment.setUpdatedBy(principal.getName());
+            shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
+            ShaftAssignment updated = repository.save(shaftAssignment);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(shaftAssignmentId)
+                    .action("UPDATED_LOAN_DETAILS")
+                    .description("Updated loan details for shaft assignment id: " + shaftAssignmentId)
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "user_audit_trail");
+            return updated;
+        }
+        return null;
+    }
+
     public List<ShaftAssignment> getByMinerId(String minerId) {
         return repository.findAll().stream()
                 .filter(s -> minerId != null && minerId.equals(String.valueOf(s.getMinerId())))
@@ -100,12 +131,12 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
     @Override
     public ShaftAssignment create(ShaftAssignment shaftAssignment, Principal principal) {
         // Check if creating this shaft exceeds the allowed number in Section
-
         shaftAssignment.setCreatedBy(principal.getName());
         shaftAssignment.setCreatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setUpdatedBy(principal.getName());
         shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setStatus("PENDING"); // Assuming reason is not set during creation
+        shaftAssignment.setOperationStatus(false); // Set default operation status
         ShaftAssignment saved = repository.save(shaftAssignment);
         shaftAssignment.setId(saved.getId());
         shaftAssignment.setLoans(new ArrayList<Loan>());
@@ -118,7 +149,7 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
                 .paymentMethod("Unknown")
                 .amountOrGrams(0)
                 .purpose("Unknown")
-                .status("Unknown")
+                .status("Not Borrowings")
                 .reason("Unknown")
                 .build());
 
