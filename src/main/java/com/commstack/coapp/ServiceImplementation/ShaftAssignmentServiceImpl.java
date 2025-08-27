@@ -28,6 +28,140 @@ import java.util.Optional;
 @Service
 public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
 
+    /**
+     * Returns all loans for a ShaftAssignment found by shaftNumbers.
+     */
+    public List<Loan> getLoansByShaftNumbers(String shaftNumbers) {
+        ShaftAssignment shaftAssignment = repository.findByShaftNumbers(shaftNumbers);
+        if (shaftAssignment != null && shaftAssignment.getLoans() != null) {
+            return shaftAssignment.getLoans();
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Updates paymentStatus, amountPaid, and balance for the first Loan in a
+     * ShaftAssignment.
+     * If amountPaid < amountOrGrams, sets paymentStatus to PARTIAL_PAYMENT and
+     * balance to the difference.
+     * If amountPaid == amountOrGrams and amountOrGrams > 0, sets paymentStatus to
+     * PAID and balance to 0.
+     * If both are 0, sets paymentStatus to Not Yet Specified and balance to 0.
+     * Returns the updated ShaftAssignment or null if not found.
+     */
+    public ShaftAssignment updateLoanPayment(String shaftAssignmentId, double amountPaid, Principal principal) {
+        ShaftAssignment shaftAssignment = repository.findByShaftNumbers(shaftAssignmentId);
+        if (shaftAssignment != null) {
+            List<Loan> loans = shaftAssignment.getLoans();
+            if (loans != null && !loans.isEmpty()) {
+                Loan loan = loans.get(0);
+                double amountOrGrams = loan.getAmountOrGrams();
+                double balance = 0;
+                String paymentStatus = "Not Yet Specified";
+                if (amountPaid < amountOrGrams) {
+                    balance = amountOrGrams - amountPaid;
+                    paymentStatus = "PARTIAL_PAYMENT";
+                } else if (amountPaid == amountOrGrams && amountOrGrams > 0) {
+                    balance = 0;
+                    paymentStatus = "PAID";
+                }
+                shaftAssignment.setAmountPaid(amountPaid);
+                shaftAssignment.setBalance(balance);
+                loan.setPaymentStatus(paymentStatus);
+                loans.set(0, loan);
+                shaftAssignment.setLoans(loans);
+                shaftAssignment.setUpdatedBy(principal.getName());
+                shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
+                ShaftAssignment updated = repository.save(shaftAssignment);
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(shaftAssignmentId)
+                        .action("LOAN_PAYMENT_UPDATED")
+                        .description("Updated loan payment for shaft assignment id: " + shaftAssignmentId)
+                        .doneBy(principal.getName())
+                        .dateTime(LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "user_audit_trail");
+                return updated;
+            }
+        }
+        return null;
+    }
+
+    public ShaftAssignment pushBackLoan(String shaftAssignmentId, Principal principal) {
+        Optional<ShaftAssignment> result = repository.findById(shaftAssignmentId);
+        if (result.isPresent()) {
+            ShaftAssignment shaftAssignment = result.get();
+            List<Loan> loans = shaftAssignment.getLoans();
+            if (loans != null && !loans.isEmpty() && "PENDING".equalsIgnoreCase(loans.get(0).getStatus())) {
+                loans.get(0).setStatus("PUSHED_BACK");
+                shaftAssignment.setLoans(loans);
+                shaftAssignment.setUpdatedBy(principal.getName());
+                shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
+                ShaftAssignment updated = repository.save(shaftAssignment);
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(shaftAssignmentId)
+                        .action("LOAN_PUSHED_BACK")
+                        .description("Pushed back loan for shaft assignment id: " + shaftAssignmentId)
+                        .doneBy(principal.getName())
+                        .dateTime(LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "user_audit_trail");
+                return updated;
+            }
+        }
+        return null;
+    }
+
+    public ShaftAssignment rejectLoan(String shaftAssignmentId, Principal principal) {
+        Optional<ShaftAssignment> result = repository.findById(shaftAssignmentId);
+        if (result.isPresent()) {
+            ShaftAssignment shaftAssignment = result.get();
+            List<Loan> loans = shaftAssignment.getLoans();
+            if (loans != null && !loans.isEmpty() && "PENDING".equalsIgnoreCase(loans.get(0).getStatus())) {
+                loans.get(0).setStatus("REJECTED");
+                shaftAssignment.setLoans(loans);
+                shaftAssignment.setUpdatedBy(principal.getName());
+                shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
+                ShaftAssignment updated = repository.save(shaftAssignment);
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(shaftAssignmentId)
+                        .action("LOAN_REJECTED")
+                        .description("Rejected loan for shaft assignment id: " + shaftAssignmentId)
+                        .doneBy(principal.getName())
+                        .dateTime(LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "user_audit_trail");
+                return updated;
+            }
+        }
+        return null;
+    }
+
+    public ShaftAssignment approveLoan(String shaftAssignmentId, Principal principal) {
+        Optional<ShaftAssignment> result = repository.findById(shaftAssignmentId);
+        if (result.isPresent()) {
+            ShaftAssignment shaftAssignment = result.get();
+            List<Loan> loans = shaftAssignment.getLoans();
+            if (loans != null && !loans.isEmpty() && "PENDING".equalsIgnoreCase(loans.get(0).getStatus())) {
+                loans.get(0).setStatus("APPROVED");
+                shaftAssignment.setLoans(loans);
+                shaftAssignment.setUpdatedBy(principal.getName());
+                shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
+                ShaftAssignment updated = repository.save(shaftAssignment);
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(shaftAssignmentId)
+                        .action("LOAN_APPROVED")
+                        .description("Approved loan for shaft assignment id: " + shaftAssignmentId)
+                        .doneBy(principal.getName())
+                        .dateTime(LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "user_audit_trail");
+                return updated;
+            }
+        }
+        return null;
+    }
+
     public ShaftAssignment updateLoanDetails(String shaftAssignmentId, String loanName, String paymentMethod,
             double amountOrGrams, String purpose, String status, String reason, Principal principal) {
         Optional<ShaftAssignment> result = repository.findById(shaftAssignmentId);
@@ -134,6 +268,8 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
         shaftAssignment.setCreatedBy(principal.getName());
         shaftAssignment.setCreatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setUpdatedBy(principal.getName());
+        shaftAssignment.setAmountPaid(0);
+        shaftAssignment.setBalance(0);
         shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setStatus("PENDING"); // Assuming reason is not set during creation
         shaftAssignment.setOperationStatus(false); // Set default operation status
@@ -148,6 +284,7 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
                 .loanName("Not Yet Specified")
                 .paymentMethod("Unknown")
                 .amountOrGrams(0)
+                .paymentStatus("")
                 .purpose("Unknown")
                 .status("Not Borrowings")
                 .reason("Unknown")

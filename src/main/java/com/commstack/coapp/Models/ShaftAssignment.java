@@ -31,6 +31,8 @@ public class ShaftAssignment {
     private List<Loan> loans;
     private String reason;
     private String createdBy;
+    private double amountPaid;
+    private double balance;
     private LocalDate createdAt;
     private String updatedBy;
     private LocalDate updatedAt;

@@ -20,6 +20,48 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShaftAssignmentController {
 
+    @GetMapping("/by-shaft-number/{shaftNumbers}/loans")
+    public ResponseEntity<List<com.commstack.coapp.Models.Loan>> getLoansByShaftNumbers(
+            @PathVariable String shaftNumbers) {
+        List<com.commstack.coapp.Models.Loan> loans = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .getLoansByShaftNumbers(shaftNumbers);
+        return ResponseEntity.ok(loans);
+    }
+
+    @PutMapping("/{id}/loan/payment")
+    public ResponseEntity<ShaftAssignment> updateLoanPayment(
+            @PathVariable("id") String shaftAssignmentId,
+            @RequestParam double amountPaid,
+            Principal principal) {
+        ShaftAssignment updated = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .updateLoanPayment(shaftAssignmentId, amountPaid, principal);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/loan/pushback")
+    public ResponseEntity<ShaftAssignment> pushBackLoan(@PathVariable("id") String shaftAssignmentId,
+            Principal principal) {
+        ShaftAssignment updated = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .pushBackLoan(shaftAssignmentId, principal);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/loan/reject")
+    public ResponseEntity<ShaftAssignment> rejectLoan(@PathVariable("id") String shaftAssignmentId,
+            Principal principal) {
+        ShaftAssignment updated = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .rejectLoan(shaftAssignmentId, principal);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/loan/approve")
+    public ResponseEntity<ShaftAssignment> approveLoan(@PathVariable("id") String shaftAssignmentId,
+            Principal principal) {
+        ShaftAssignment updated = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .approveLoan(shaftAssignmentId, principal);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
+
     @PutMapping("/{id}/update-loan-details")
     public ResponseEntity<ShaftAssignment> updateLoanDetails(
             @PathVariable("id") String shaftAssignmentId,
