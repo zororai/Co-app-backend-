@@ -22,6 +22,10 @@ public class TransportCostonboardingServiceImpl implements TransportCostonboardi
     @Override
     public TransportCostonboarding create(TransportCostonboarding transportCostonboarding, Principal principal) {
         transportCostonboarding.setStatus("PENDING");
+        transportCostonboarding.setCreatedBy(principal.getName());
+        transportCostonboarding.setCreatedDate(LocalDateTime.now());
+        transportCostonboarding.setUpdatedBy(principal.getName());
+        transportCostonboarding.setUpdatedDate(LocalDateTime.now());
         TransportCostonboarding saved = repository.save(transportCostonboarding);
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(saved.getId())

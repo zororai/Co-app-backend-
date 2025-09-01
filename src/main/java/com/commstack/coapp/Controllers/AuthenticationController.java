@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "https://coappapi.commapp.online/", allowCredentials = "true")
 public class AuthenticationController {
     @Autowired
     private UserServiceResetImpl userServiceResetImpl;
