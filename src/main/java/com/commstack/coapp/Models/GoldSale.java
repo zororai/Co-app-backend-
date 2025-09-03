@@ -15,5 +15,5 @@ public class GoldSale {
     private double price;
     private String buyer;
 
-    // Getters and Setters
+
 }
