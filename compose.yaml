@@ -41,15 +41,16 @@ services:
     volumes:
       - ./db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
     environment:
-      WAIT_HOSTS: mongodb2:27017
+      
 
     
-      SPRING_DATA_MONGODB_URL: mongodb2://mongodb2:27017/coapp
-     
-      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
-    
-      SPRING_DATA_MONGODB_USERNAME: admin
-      SPRING_DATA_MONGODB_PASSWORD: commstackcoapp123
+      SPRING_DATA_MONGODB_HOST: cosmosdb-1.mongocluster.cosmos.azure.com
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: co-app
+      SPRING_DATA_MONGODB_USERNAME: commstackadmin
+      SPRING_DATA_MONGODB_PASSWORD: S!@#exy1@123
+      SPRING_DATA_MONGODB_URL: mongodb+srv://commstackadmin:S%21%40%23exy1%40123@cosmosdb-1.mongocluster.cosmos.azure.com/co-app?tls=true&authMechanism=SCRAM-SHA-256
+
 
     profiles:
       - dev
