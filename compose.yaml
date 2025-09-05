@@ -14,9 +14,9 @@ services:
       - ./db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
 
     environment:
-      MONGO_INITDB_DATABASE: coapp
-      MONGO_INITDB_ROOT_PASSWORD: commstackcoapp123
-      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_DATABASE: co-app
+      MONGO_INITDB_ROOT_PASSWORD: S!@#exy1@123
+      MONGO_INITDB_ROOT_USERNAME: commstackadmin
     ports:
       - "27017:27017"
     healthcheck:
