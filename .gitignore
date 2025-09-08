@@ -38,3 +38,6 @@ compose.yaml
 
 
 
+compose.yaml
+src/main/java/com/commstack/coapp/DemoApplication.java
+src/main/resources/application-dev.properties
