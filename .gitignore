@@ -30,10 +30,12 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
-
-
-
-
+.vscode/
+src/main/java/com/commstack/coapp/Configs/GlobalCorsConfig.java
 src/main/java/com/commstack/coapp/DemoApplication.java
 src/main/resources/application-dev.properties
 compose.yaml
+
+
+
+
