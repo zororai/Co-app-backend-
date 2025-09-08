@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/drivers")
-@CrossOrigin(origins = "https://coappapi.commapp.online/", allowCredentials = "true")
 @SecurityRequirement(name = "Bearer Authentication")
 public class DriverController {
 

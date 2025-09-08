@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/production-loan")
-@CrossOrigin(origins = "https://coappapi.commapp.online/", allowCredentials = "true")
 @SecurityRequirement(name = "Bearer Authentication")
 public class ProductionLoanController {
 
