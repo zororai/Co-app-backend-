@@ -19,6 +19,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShaftAssignmentController {
 
+    @GetMapping("/shaft-numbers/by-section/{sectionName}")
+    public ResponseEntity<List<String>> getShaftNumbersBySectionName(@PathVariable String sectionName) {
+        List<String> shaftNumbers = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .getShaftNumbersBySectionName(sectionName);
+        String generated;
+        if (sectionName != null && sectionName.length() >= 3) {
+            if (shaftNumbers.isEmpty()) {
+                generated = sectionName.substring(0, 2) + sectionName.charAt(sectionName.length() - 1) + "1";
+            } else {
+                // Find max numeric part in shaftNumbers
+                int maxNum = shaftNumbers.stream()
+                        .map(sn -> sn.replaceAll("[^0-9]", ""))
+                        .filter(s -> !s.isEmpty())
+                        .mapToInt(Integer::parseInt)
+                        .max().orElse(0);
+                generated = sectionName.substring(0, 2) + sectionName.charAt(sectionName.length() - 1) + (maxNum + 1);
+            }
+            shaftNumbers = List.of(generated);
+        }
+        return ResponseEntity.ok(shaftNumbers);
+    }
+
     @GetMapping("/by-shaft-number/{shaftNumbers}/loans")
     public ResponseEntity<List<com.commstack.coapp.Models.Loan>> getLoansByShaftNumbers(
             @PathVariable String shaftNumbers) {
