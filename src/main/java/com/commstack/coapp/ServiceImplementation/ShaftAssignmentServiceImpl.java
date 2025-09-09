@@ -29,6 +29,27 @@ import java.util.Optional;
 public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
 
     /**
+     * Returns a list of all shaftNumbers for a given sectionName.
+     */
+    public List<String> getShaftNumbersBySectionName(String sectionName) {
+        return repository.findAll().stream()
+                .filter(s -> sectionName != null && sectionName.equalsIgnoreCase(s.getSectionName()))
+                .map(ShaftAssignment::getShaftNumbers)
+                .filter(sn -> sn != null && !sn.isEmpty())
+                .toList();
+    }
+
+    /**
+     * Returns a list of all shaftNumbers from all ShaftAssignments.
+     */
+    public List<String> getAllShaftNumbers() {
+        return repository.findAll().stream()
+                .map(ShaftAssignment::getShaftNumbers)
+                .filter(s -> s != null && !s.isEmpty())
+                .toList();
+    }
+
+    /**
      * Returns all loans for a ShaftAssignment found by shaftNumbers.
      */
     public List<Loan> getLoansByShaftNumbers(String shaftNumbers) {
