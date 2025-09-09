@@ -14,7 +14,7 @@ public class OreSample {
     private String id;
     private String sampleType;
     private String sampleWeight;
-    private String sampleSize;
+
     private double result;
     private String status;
     private String reason;

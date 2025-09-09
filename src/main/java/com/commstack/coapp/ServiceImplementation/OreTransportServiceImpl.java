@@ -115,7 +115,6 @@ public class OreTransportServiceImpl implements OreTransportService {
                         sample.setSampleType(sampleType);
                         sample.setSampleWeight(sampleWeight);
                         sample.setStatus(status);
-                        sample.setSampleSize(sampleSize);
                         sample.setReason("Unknown");
                         sample.setResult(0.0);
                         break;
@@ -375,7 +374,6 @@ public class OreTransportServiceImpl implements OreTransportService {
                 .sampleType("Unknown")
                 .sampleWeight("Unknown")
                 .status("Unknown")
-                .sampleSize("Unknown")
                 .result(0.0)
                 .reason("Unknown")
                 .build());
@@ -410,10 +408,10 @@ public class OreTransportServiceImpl implements OreTransportService {
             }
         } else {
             transportCosts.add(TransportCost.builder()
-                    .paymentMethod("Unknown")
+                    .paymentMethod("Not Specified")
                     .amountOrGrams(0.0)
                     .status("Not Paid")
-                    .reason("Unknown")
+                    .reason("Not Specified")
                     .build());
         }
         oreTransport.setTransportCosts(transportCosts);
