@@ -9,8 +9,12 @@ import com.commstack.coapp.Models.OreSample;
 import com.commstack.coapp.Models.OreTransport;
 import com.commstack.coapp.Models.OreTransportAuditTrail;
 import com.commstack.coapp.Models.Regminer;
+import com.commstack.coapp.Models.TransportCost;
 import com.commstack.coapp.Repositories.OreTransportRepository;
 import com.commstack.coapp.Service.OreTransportService;
+
+import jakarta.mail.Transport;
+
 import com.commstack.coapp.Models.UserAuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -322,6 +326,9 @@ public class OreTransportServiceImpl implements OreTransportService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private com.commstack.coapp.Repositories.TransportCostonboardingRepository transportCostonboardingRepository;
+
     private String generateRegistrationNumber() {
         String datePart = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
         int randomPart = (int) (Math.random() * 9000) + 1000;
@@ -384,7 +391,33 @@ public class OreTransportServiceImpl implements OreTransportService {
                 .build());
         oreTransport.setGoldSales(goldSales);
 
-        oreTransport.setGoldSales(goldSales);
+        List<TransportCost> transportCosts = new ArrayList<>();
+        // Fetch approved TransportCostonboarding records
+        List<com.commstack.coapp.Models.TransportCostonboarding> approvedOnboardings = transportCostonboardingRepository
+                .findAll()
+                .stream()
+                .filter(tc -> "APPROVED".equalsIgnoreCase(tc.getStatus()))
+                .toList();
+
+        if (!approvedOnboardings.isEmpty()) {
+            for (com.commstack.coapp.Models.TransportCostonboarding tc : approvedOnboardings) {
+                transportCosts.add(TransportCost.builder()
+                        .paymentMethod(tc.getPaymentMethod())
+                        .amountOrGrams(tc.getAmountOrGrams())
+                        .status("Not Paid")
+                        .reason("Ore Transport Cost")
+                        .build());
+            }
+        } else {
+            transportCosts.add(TransportCost.builder()
+                    .paymentMethod("Unknown")
+                    .amountOrGrams(0.0)
+                    .status("Not Paid")
+                    .reason("Unknown")
+                    .build());
+        }
+        oreTransport.setTransportCosts(transportCosts);
+
         oreTransport.setSecurityDispatcherStatus("Not Specified");
         oreTransport.setOreUniqueId(generateRegistrationNumber());
         oreTransport.setCreatedBy(principal != null ? principal.getName() : "system");

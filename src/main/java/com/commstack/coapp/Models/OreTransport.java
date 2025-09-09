@@ -36,7 +36,7 @@ public class OreTransport {
     private String transportReason;
     private String securityDispatcherStatus;
     private String processStatus;
-    private List<TransportCost> loans;
+    private List<TransportCost> transportCosts;
     private List<OreSample> oreSample;
     private String location;
     private LocalDateTime date;
