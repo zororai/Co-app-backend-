@@ -110,7 +110,8 @@ public class OreTransportServiceImpl implements OreTransportService {
 
     // Update OreSample status and reason when current status is 'Unknown'
     @Override
-    public ResponseEntity<OreTransport> updateSampleStatusAndReason(String oreTransportId, String newStatus, String newReason) {
+    public ResponseEntity<OreTransport> updateSampleStatusAndReason(String oreTransportId, String newStatus,
+            String newReason, double newResult) {
         Optional<OreTransport> existing = repository.findById(oreTransportId);
         if (existing.isPresent()) {
             OreTransport oreTransport = existing.get();
@@ -118,9 +119,10 @@ public class OreTransportServiceImpl implements OreTransportService {
             if (oreSamples != null) {
                 for (OreSample sample : oreSamples) {
                     if ("Unknown".equals(sample.getStatus())) {
-                        sample.setStatus(newStatus);
                         sample.setReason(newReason);
-                        
+                        sample.setResult(newResult);
+                        sample.setStatus(newStatus);
+
                         // Update process status based on the new status
                         if ("REJECTED".equals(newStatus)) {
                             oreTransport.setProcessStatus("REJECTED");
@@ -132,7 +134,7 @@ public class OreTransportServiceImpl implements OreTransportService {
                 }
                 oreTransport.setOreSample(oreSamples);
                 repository.save(oreTransport);
-                
+
                 // Add audit trail
                 UserAuditTrail audit = UserAuditTrail.builder()
                         .userId(oreTransportId)

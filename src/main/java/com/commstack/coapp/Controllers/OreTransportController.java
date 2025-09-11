@@ -20,12 +20,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OreTransportController {
 
-    @PutMapping("/{id}/update-sample-status-reas")
+    @PutMapping("/{id}/update-sample-status-reason")
     public ResponseEntity<OreTransport> updateSampleStatusAndReason(
             @PathVariable("id") String oreTransportId,
             @RequestParam String newStatus,
+            @RequestParam String newResult,
             @RequestParam String newReason) {
-        return service.updateSampleStatusAndReason(oreTransportId, newStatus, newReason);
+        return service.updateSampleStatusAndReason(oreTransportId, newStatus, newReason, Double.parseDouble(newResult));
     }
 
     @PutMapping("/{id}/collect-sample")
