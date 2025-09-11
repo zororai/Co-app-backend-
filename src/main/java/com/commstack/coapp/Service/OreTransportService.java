@@ -45,4 +45,6 @@ public interface OreTransportService {
 
         ResponseEntity<OreTransport> collectSample(String oreTransportId, String sampleType,
                         String sampleWeight, String status, String sampleSize);
+
+        ResponseEntity<OreTransport> updateSampleStatusAndReason(String oreTransportId, String newStatus, String newReason);
 }

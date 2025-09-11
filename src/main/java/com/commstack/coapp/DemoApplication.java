@@ -12,7 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "CO-APP API", version = "1.0", description = "API Information"), servers = @Server(url = "https://coappapi.commapp.online/"))
+@OpenAPIDefinition(info = @Info(title = "CO-APP API", version = "1.0", description = "API Information"))
+// , servers = @Server(url = "https://coappapi.commapp.online/"))
 @SecurityScheme(name = "Bearer Authentication", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 public class DemoApplication {
 

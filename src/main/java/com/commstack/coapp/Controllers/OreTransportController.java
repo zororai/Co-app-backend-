@@ -20,22 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OreTransportController {
 
-    @PutMapping("/{id}/update-gold-sale")
-    public ResponseEntity<OreTransport> updateGoldSale(
+    @PutMapping("/{id}/update-sample-status-reas")
+    public ResponseEntity<OreTransport> updateSampleStatusAndReason(
             @PathVariable("id") String oreTransportId,
-            @RequestParam double weight,
-            @RequestParam double price,
-            @RequestParam String buyer) {
-        return service.updateGoldSale(oreTransportId, weight, price, buyer);
-    }
-
-    @PutMapping("/{id}/update-sample-if-default")
-    public ResponseEntity<OreTransport> updateSampleIfDefault(
-            @PathVariable("id") String oreTransportId,
-            @RequestParam String newReason,
-            @RequestParam double newResult,
-            @RequestParam String newStatus) {
-        return service.updateSampleIfDefault(oreTransportId, newReason, newResult, newStatus);
+            @RequestParam String newStatus,
+            @RequestParam String newReason) {
+        return service.updateSampleStatusAndReason(oreTransportId, newStatus, newReason);
     }
 
     @PutMapping("/{id}/collect-sample")

@@ -69,6 +69,8 @@ public class OreTransportServiceImpl implements OreTransportService {
 
     // Update OreSample by id, only if its reason, result, and status are the
     // default values
+
+    @Override
     public ResponseEntity<OreTransport> updateSampleIfDefault(String oreTransportId, String newReason,
             double newResult, String newStatus) {
         Optional<OreTransport> existing = repository.findById(oreTransportId);
@@ -77,22 +79,69 @@ public class OreTransportServiceImpl implements OreTransportService {
             List<OreSample> oreSamples = oreTransport.getOreSample();
             if (oreSamples != null) {
                 for (OreSample sample : oreSamples) {
-                    if ("Unknown".equals(sample.getReason())
-                            && sample.getResult() == 0.0
-                            && "ending for results".equals(sample.getStatus())) {
+                    if (0.0 == sample.getResult()) {
                         sample.setReason(newReason);
                         sample.setResult(newResult);
                         sample.setStatus(newStatus);
-                        if (newStatus.equals("Rejected")) {
-                            oreTransport.setProcessStatus("Rejected");
+                        if (newStatus.equals("REJECTED")) {
+                            oreTransport.setProcessStatus("REJECTED");
                         } else {
-                            oreTransport.setProcessStatus("Approved");
+                            oreTransport.setProcessStatus("APPROVED");
                         }
                         break;
                     }
                 }
                 oreTransport.setOreSample(oreSamples);
                 repository.save(oreTransport);
+                // Add audit trail for sample collection
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(oreTransportId)
+                        .action("COLLECT_SAMPLE")
+                        .description("Collected ore sample for OreTransport id=" + oreTransportId)
+                        .doneBy("system")
+                        .dateTime(java.time.LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "ore_transport_audit_trail");
+                return ResponseEntity.ok(oreTransport);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    // Update OreSample status and reason when current status is 'Unknown'
+    @Override
+    public ResponseEntity<OreTransport> updateSampleStatusAndReason(String oreTransportId, String newStatus, String newReason) {
+        Optional<OreTransport> existing = repository.findById(oreTransportId);
+        if (existing.isPresent()) {
+            OreTransport oreTransport = existing.get();
+            List<OreSample> oreSamples = oreTransport.getOreSample();
+            if (oreSamples != null) {
+                for (OreSample sample : oreSamples) {
+                    if ("Unknown".equals(sample.getStatus())) {
+                        sample.setStatus(newStatus);
+                        sample.setReason(newReason);
+                        
+                        // Update process status based on the new status
+                        if ("REJECTED".equals(newStatus)) {
+                            oreTransport.setProcessStatus("REJECTED");
+                        } else if ("APPROVED".equals(newStatus)) {
+                            oreTransport.setProcessStatus("APPROVED");
+                        }
+                        break;
+                    }
+                }
+                oreTransport.setOreSample(oreSamples);
+                repository.save(oreTransport);
+                
+                // Add audit trail
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(oreTransportId)
+                        .action("UPDATE_SAMPLE_STATUS_REASON")
+                        .description("Updated ore sample status and reason for OreTransport id=" + oreTransportId)
+                        .doneBy("system")
+                        .dateTime(java.time.LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "ore_transport_audit_trail");
                 return ResponseEntity.ok(oreTransport);
             }
         }
