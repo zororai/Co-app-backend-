@@ -16,8 +16,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/blasting-equipment")
-@CrossOrigin(origins = "https://coappapi.commapp.online/", allowCredentials = "true")
+
 @SecurityRequirement(name = "Bearer Authentication")
+@CrossOrigin(origins = "https://coappapi.commapp.online/", allowCredentials = "true")
 @RequiredArgsConstructor
 public class BlastingEquipmentController {
 
