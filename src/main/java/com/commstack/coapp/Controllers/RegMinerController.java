@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://coappapi.commapp.online/", allowCredentials = "true")
+@CrossOrigin(origins = "https://coappapi.commapp.online", allowCredentials = "true")
 @RequiredArgsConstructor
 @RequestMapping("/api/miners")
 public class RegMinerController {
