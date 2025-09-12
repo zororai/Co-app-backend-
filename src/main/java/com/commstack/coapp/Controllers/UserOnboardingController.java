@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")
+@CrossOrigin(origins = "https://coapp.commapp.online", allowCredentials = "true")
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserOnboardingController {

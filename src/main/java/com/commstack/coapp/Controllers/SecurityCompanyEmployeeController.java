@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/security-company-employees")
 @SecurityRequirement(name = "Bearer Authentication")
+@CrossOrigin(origins = "https://coapp.commapp.online", allowCredentials = "true")
 @RequiredArgsConstructor
 public class SecurityCompanyEmployeeController {
 
