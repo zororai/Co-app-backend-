@@ -18,8 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -82,20 +80,6 @@ public class SecurityConfiguration extends AbstractHttpConfigurer {
         return config.getAuthenticationManager();
     }
 
-    @Bean("customCorsConfiguration")
-    public WebMvcConfigurer customCorsConfiguration() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(
-                                "https://coappapi.commapp.online",
-                                "http://localhost:1000")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowCredentials(true);
-            }
-        };
-    }
 
     // ✅ Add CORS config
     @Bean
@@ -105,7 +89,9 @@ public class SecurityConfiguration extends AbstractHttpConfigurer {
         // allow your frontend domain(s)
         configuration.setAllowedOrigins(List.of(
                 "https://coapp.commapp.online", // production frontend
-                "http://localhost:3002" // local dev
+                "https://coappapi.commapp.online", // production API domain
+                "http://localhost:3002", // local dev
+                "http://localhost:1000" // local dev alternate
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
