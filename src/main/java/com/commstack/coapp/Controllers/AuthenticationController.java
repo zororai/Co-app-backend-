@@ -19,7 +19,6 @@ import java.util.Optional;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://coappapi.commapp.online", allowCredentials = "true")
 
 public class AuthenticationController {
     @Autowired

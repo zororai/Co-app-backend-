@@ -17,7 +17,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/ore-transports")
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://coappapi.commapp.online", allowCredentials = "true")
 @RequiredArgsConstructor
 public class OreTransportController {
 

@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/mill-onboarding")
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://coappapi.commapp.online", allowCredentials = "true")
 
 public class MillOnboardingController {
 

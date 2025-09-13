@@ -15,7 +15,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "CO-APP API", version = "1.0", description = "API Information"), servers = @Server(url = "https://coappapi.commapp.online/"))
+@OpenAPIDefinition(info = @Info(title = "CO-APP API", version = "1.0", description = "API Information"))
+// , servers = @Server(url = "https://coappapi.commapp.online/"))
 @SecurityScheme(name = "Bearer Authentication", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 public class DemoApplication {
 
@@ -29,7 +30,7 @@ public class DemoApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins("https://coappui.commapp.online") // adjust
+						.allowedOrigins("https://localhost:1000") // adjust
 						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 						.allowCredentials(true);
 			}

@@ -12,7 +12,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/transport-cost-onboarding")
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://coappapi.commapp.online", allowCredentials = "true")
 @RequiredArgsConstructor
 public class TransportCostonboardingController {
     private final TransportCostonboardingService service;

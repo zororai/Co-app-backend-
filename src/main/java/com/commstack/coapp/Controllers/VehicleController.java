@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/vehicles")
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "https://coappapi.commapp.online", allowCredentials = "true")
 @RequiredArgsConstructor
 public class VehicleController {
 
