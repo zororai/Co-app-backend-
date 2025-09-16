@@ -1,13 +1,16 @@
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.IncidentManagement;
+import com.commstack.coapp.Models.UserAuditTrail;
 import com.commstack.coapp.Repositories.IncidentManagementRepository;
 import com.commstack.coapp.Service.IncidentManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +19,23 @@ public class IncidentManagementServiceImpl implements IncidentManagementService 
 
     @Autowired
     private IncidentManagementRepository repository;
+    
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public ResponseEntity<IncidentManagement> create(IncidentManagement incident, Principal principal) {
         IncidentManagement saved = repository.save(incident);
+
+        UserAuditTrail audit = UserAuditTrail.builder()
+                .userId(saved.getId())
+                .action("CREATED")
+                .description("Incident created: '" + saved.getIncidentTitle() + "' (Severity: '" + saved.getSeverityLevel() + "')")
+                .doneBy(principal != null ? principal.getName() : "SYSTEM")
+                .dateTime(LocalDateTime.now())
+                .build();
+        mongoTemplate.save(audit, "incident_audit_trail");
+
         return ResponseEntity.ok(saved);
     }
 
@@ -50,6 +66,16 @@ public class IncidentManagementServiceImpl implements IncidentManagementService 
         existing.setParticipants(incident.getParticipants());
 
         IncidentManagement updated = repository.save(existing);
+
+        UserAuditTrail audit = UserAuditTrail.builder()
+                .userId(id)
+                .action("UPDATED")
+                .description("Incident updated: '" + updated.getIncidentTitle() + "' (Severity: '" + updated.getSeverityLevel() + "')")
+                .doneBy(principal != null ? principal.getName() : "SYSTEM")
+                .dateTime(LocalDateTime.now())
+                .build();
+        mongoTemplate.save(audit, "incident_audit_trail");
+
         return ResponseEntity.ok(updated);
     }
 
@@ -59,6 +85,18 @@ public class IncidentManagementServiceImpl implements IncidentManagementService 
         if (existing.isEmpty()) {
             return ResponseEntity.status(404).body("Incident not found");
         }
+
+        IncidentManagement incident = existing.get();
+
+        UserAuditTrail audit = UserAuditTrail.builder()
+                .userId(id)
+                .action("DELETED")
+                .description("Incident deleted: '" + incident.getIncidentTitle() + "' (Severity: '" + incident.getSeverityLevel() + "')")
+                .doneBy(principal != null ? principal.getName() : "SYSTEM")
+                .dateTime(LocalDateTime.now())
+                .build();
+        mongoTemplate.save(audit, "incident_audit_trail");
+
         repository.deleteById(id);
         return ResponseEntity.ok("Incident deleted successfully");
     }
