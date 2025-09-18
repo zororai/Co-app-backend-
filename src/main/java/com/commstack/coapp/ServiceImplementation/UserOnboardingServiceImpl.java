@@ -1,8 +1,12 @@
 package com.commstack.coapp.ServiceImplementation;
 
 import com.commstack.coapp.Models.UserOnboarding;
+import com.commstack.coapp.Models.permissions;
+import com.commstack.coapp.Models.Mill;
+import com.commstack.coapp.Models.Signup;
 import com.commstack.coapp.Models.UserAuditTrail;
 import com.commstack.coapp.Repositories.UserOnboardingRepository;
+import com.commstack.coapp.Service.AuthenticationService;
 import com.commstack.coapp.Service.UserOnboardingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -11,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,14 +28,27 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private AuthenticationService authenticationService;
+
     @Override
     public ResponseEntity<String> create(UserOnboarding user, Principal principal) {
+        // First create authentication user
+        Signup signupRequest = Signup.builder()
+                .fullName(user.getName() + " " + user.getSurname())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .build();
+
+        authenticationService.signup(signupRequest, principal);
+
         // Set creation metadata
         user.setCreatedBy(principal.getName());
         user.setCreatedAt(LocalDate.now());
         user.setUpdatedBy(principal.getName());
         user.setUpdatedAt(LocalDate.now());
         user.setStatus("PENDING");
+  
 
         // Save the user
         UserOnboarding savedUser = repository.save(user);

@@ -31,7 +31,7 @@ public class UserOnboarding {
     private String position;
     private String location;
     private String role;
-    // private List<String> permissions;
+    private List<permissions> permissions;
     private String status;
     private String notes;
     private String reason;
