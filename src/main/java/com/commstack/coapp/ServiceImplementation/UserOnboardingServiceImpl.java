@@ -8,6 +8,8 @@ import com.commstack.coapp.Models.UserAuditTrail;
 import com.commstack.coapp.Repositories.UserOnboardingRepository;
 import com.commstack.coapp.Service.AuthenticationService;
 import com.commstack.coapp.Service.UserOnboardingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,8 @@ import java.util.Optional;
 @Service
 public class UserOnboardingServiceImpl implements UserOnboardingService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserOnboardingServiceImpl.class);
+
     @Autowired
     private UserOnboardingRepository repository;
 
@@ -33,38 +37,70 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
 
     @Override
     public ResponseEntity<String> create(UserOnboarding user, Principal principal) {
-        // First create authentication user
-        Signup signupRequest = Signup.builder()
-                .fullName(user.getName() + " " + user.getSurname())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .build();
+        try {
+            logger.info("Creating new user onboarding for email: {}", user.getEmail());
 
-        authenticationService.signup(signupRequest, principal);
+            // Validate required fields
+            if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Email is required");
+            }
+            if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Password is required");
+            }
+            if (user.getName() == null || user.getName().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Name is required");
+            }
 
-        // Set creation metadata
-        user.setCreatedBy(principal.getName());
-        user.setCreatedAt(LocalDate.now());
-        user.setUpdatedBy(principal.getName());
-        user.setUpdatedAt(LocalDate.now());
-        user.setStatus("PENDING");
-  
+            // First create authentication user
+            Signup signupRequest = Signup.builder()
+                    .fullName(user.getName() + " " + user.getSurname())
+                    .email(user.getEmail())
+                    .password(user.getPassword())
+                    .build();
 
-        // Save the user
-        UserOnboarding savedUser = repository.save(user);
+            logger.info("Attempting to create authentication user for: {}", user.getEmail());
+            ResponseEntity<Object> signupResponse = authenticationService.signup(signupRequest, principal);
 
-        // Create audit trail
-        UserAuditTrail audit = UserAuditTrail.builder()
-                .userId(savedUser.getId())
-                .action("CREATED")
-                .description("New user created with name: '" + user.getName() + " " + user.getSurname() +
-                        "', position: '" + user.getPosition() + "'")
-                .doneBy(principal.getName())
-                .dateTime(LocalDateTime.now())
-                .build();
-        mongoTemplate.save(audit, "user_audit_trail");
+            // Check if signup was successful
+            if (signupResponse.getStatusCodeValue() != 200) {
+                logger.error("Authentication user creation failed for {}: {}", user.getEmail(),
+                        signupResponse.getBody());
+                return ResponseEntity.status(signupResponse.getStatusCodeValue())
+                        .body("Failed to create authentication user: " + signupResponse.getBody());
+            }
 
-        return ResponseEntity.ok("User created successfully");
+            logger.info("Authentication user created successfully for: {}", user.getEmail());
+
+            // Set creation metadata
+            user.setCreatedBy(principal.getName());
+            user.setCreatedAt(LocalDate.now());
+            user.setUpdatedBy(principal.getName());
+            user.setUpdatedAt(LocalDate.now());
+            user.setStatus("PENDING");
+
+            // Save the user
+            UserOnboarding savedUser = repository.save(user);
+            logger.info("UserOnboarding saved with ID: {}", savedUser.getId());
+
+            // Create audit trail
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(savedUser.getId())
+                    .action("CREATED")
+                    .description("New user created with name: '" + user.getName() + " " + user.getSurname() +
+                            "', position: '" + user.getPosition() + "'")
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "user_audit_trail");
+
+            logger.info("User onboarding process completed successfully for: {}", user.getEmail());
+            return ResponseEntity.ok("User created successfully");
+
+        } catch (Exception e) {
+            logger.error("Error creating user onboarding for {}: {}", user.getEmail(), e.getMessage(), e);
+            return ResponseEntity.status(500)
+                    .body("Error creating user: " + e.getMessage());
+        }
     }
 
     @Override
