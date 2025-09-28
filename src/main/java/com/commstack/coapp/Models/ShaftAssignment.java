@@ -27,6 +27,7 @@ public class ShaftAssignment {
     private String regFee;
     private LocalDate startContractDate;
     private LocalDate endContractDate;
+    private boolean isActive;
     private String status;
     private List<Loan> loans;
     private String reason;

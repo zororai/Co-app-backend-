@@ -33,6 +33,7 @@ public class SectionServiceImpl implements SectionService {
         section.setCreatedBy(principal.getName());
         section.setCreatedAt(LocalDate.now());
         section.setUpdatedBy(principal.getName());
+        section.setActive(false);
         section.setUpdatedAt(LocalDate.now());
         section.setStatus("PENDING");
 
@@ -249,5 +250,110 @@ public class SectionServiceImpl implements SectionService {
     public ResponseEntity getAllPushedBackSections() {
         List<Section> sections = repository.findByStatus("PUSHED_BACK");
         return ResponseEntity.ok(sections);
+    }
+
+    @Override
+    public ResponseEntity<String> activateSection(String id, Principal principal) {
+        Optional<Section> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            Section section = existing.get();
+
+            // Check if section is already active
+            if (section.isActive()) {
+                return ResponseEntity.status(400).body("Section is already active");
+            }
+
+            // Check if section is approved before allowing activation
+            if (!"APPROVED".equals(section.getStatus())) {
+                return ResponseEntity.status(400).body("Section must be approved before it can be activated");
+            }
+
+            boolean wasActive = section.isActive();
+            section.setActive(true);
+            section.setUpdatedBy(principal.getName());
+            section.setUpdatedAt(LocalDate.now());
+
+            repository.save(section);
+
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("ACTIVATED")
+                    .description(
+                            "Section '" + section.getSectionName() + "' was activated. Active status changed from '"
+                                    + wasActive + "' to 'true'")
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "section_audit_trail");
+
+            return ResponseEntity.ok("Section activated successfully");
+        }
+        return ResponseEntity.status(404).body("Section not found");
+    }
+
+    @Override
+    public ResponseEntity<String> deactivateSection(String id, Principal principal) {
+        Optional<Section> existing = repository.findById(id);
+        if (existing.isPresent()) {
+            Section section = existing.get();
+
+            // Check if section is already inactive
+            if (!section.isActive()) {
+                return ResponseEntity.status(400).body("Section is already inactive");
+            }
+
+            boolean wasActive = section.isActive();
+            section.setActive(false);
+            section.setUpdatedBy(principal.getName());
+            section.setUpdatedAt(LocalDate.now());
+
+            repository.save(section);
+
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("DEACTIVATED")
+                    .description(
+                            "Section '" + section.getSectionName() + "' was deactivated. Active status changed from '"
+                                    + wasActive + "' to 'false'")
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "section_audit_trail");
+
+            return ResponseEntity.ok("Section deactivated successfully");
+        }
+        return ResponseEntity.status(404).body("Section not found");
+    }
+
+    @Override
+    public ResponseEntity<List<Section>> getDeactivatedPendingSections() {
+        try {
+            List<Section> deactivatedPendingSections = repository.findByActiveFalseAndStatus("PENDING");
+
+            // Create audit trail for this query
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId("SYSTEM")
+                    .action("QUERY")
+                    .description("Retrieved " + deactivatedPendingSections.size() +
+                            " sections with deactivated status and PENDING approval")
+                    .doneBy("SYSTEM")
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "section_audit_trail");
+
+            return ResponseEntity.ok(deactivatedPendingSections);
+        } catch (Exception e) {
+            // Log error
+            UserAuditTrail errorAudit = UserAuditTrail.builder()
+                    .userId("SYSTEM")
+                    .action("ERROR")
+                    .description("Error retrieving deactivated pending sections: " + e.getMessage())
+                    .doneBy("SYSTEM")
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(errorAudit, "section_audit_trail");
+
+            return ResponseEntity.status(500).body(null);
+        }
     }
 }

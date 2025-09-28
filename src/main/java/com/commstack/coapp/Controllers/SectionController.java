@@ -81,4 +81,19 @@ public class SectionController {
     public ResponseEntity<String> getPushedBackSections() {
         return service.getAllPushedBackSections();
     }
+
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<String> activateSection(@PathVariable String id, Principal principal) {
+        return service.activateSection(id, principal);
+    }
+
+    @PutMapping("/{id}/deactivate")
+    public ResponseEntity<String> deactivateSection(@PathVariable String id, Principal principal) {
+        return service.deactivateSection(id, principal);
+    }
+
+    @GetMapping("/status/deactivated-pending")
+    public ResponseEntity<List<Section>> getDeactivatedPendingSections() {
+        return service.getDeactivatedPendingSections();
+    }
 }

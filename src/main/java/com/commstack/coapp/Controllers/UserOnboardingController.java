@@ -1,11 +1,11 @@
 package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.UserOnboarding;
+import com.commstack.coapp.DTO.EmailRequest;
 import com.commstack.coapp.Service.UserOnboardingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
@@ -94,5 +94,15 @@ public class UserOnboardingController {
         } else {
             return ResponseEntity.status(response.getStatusCode()).build();
         }
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<String> getEmail(@RequestParam String email) {
+        return service.getEmailResponse(email);
+    }
+
+    @PostMapping("/email")
+    public ResponseEntity<String> getEmailFromBody(@RequestBody EmailRequest emailRequest) {
+        return service.getEmailResponse(emailRequest.getEmail());
     }
 }

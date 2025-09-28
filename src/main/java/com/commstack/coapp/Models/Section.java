@@ -18,6 +18,7 @@ public class Section {
     private String id;
     private String sectionName;
     private int numberOfShaft;
+    private boolean isActive;
 
     // Status tracking
     private String status;

@@ -310,4 +310,23 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         List<UserOnboarding> users = repository.findByStatus("PUSHED_BACK");
         return ResponseEntity.ok(users.toString());
     }
+
+    @Override
+    public ResponseEntity<String> getEmailResponse(String email) {
+        try {
+            logger.info("Received email request for: {}", email);
+
+            // Validate email input
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Email parameter is required");
+            }
+
+            // Return the email
+            return ResponseEntity.ok(email);
+
+        } catch (Exception e) {
+            logger.error("Error processing email request: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body("Error processing email request: " + e.getMessage());
+        }
+    }
 }

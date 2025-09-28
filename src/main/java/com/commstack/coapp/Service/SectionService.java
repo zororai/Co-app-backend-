@@ -35,4 +35,10 @@ public interface SectionService {
     ResponseEntity<String> getAllRejectedSections();
 
     ResponseEntity<String> getAllPushedBackSections();
+
+    ResponseEntity<String> activateSection(String id, Principal principal);
+
+    ResponseEntity<String> deactivateSection(String id, Principal principal);
+
+    ResponseEntity<List<Section>> getDeactivatedPendingSections();
 }

@@ -14,4 +14,6 @@ public interface SectionRepository extends MongoRepository<Section, String> {
     Section findBySectionNameAndMinerId(String sectionName, String minerId);
 
     List<Section> findByNumberOfShaft(String numberOfShaft);
+
+    List<Section> findByActiveFalseAndStatus(String status);
 }
