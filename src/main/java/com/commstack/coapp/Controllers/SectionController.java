@@ -2,10 +2,10 @@ package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.Section;
 import com.commstack.coapp.Service.SectionService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
@@ -93,6 +93,7 @@ public class SectionController {
     }
 
     @GetMapping("/status/deactivated-pending")
+    @Operation(summary = "Get deactivated pending sections", description = "Retrieves all sections that are deactivated (active=false) and have PENDING status")
     public ResponseEntity<List<Section>> getDeactivatedPendingSections() {
         return service.getDeactivatedPendingSections();
     }

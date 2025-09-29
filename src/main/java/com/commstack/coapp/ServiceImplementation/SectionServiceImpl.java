@@ -328,30 +328,60 @@ public class SectionServiceImpl implements SectionService {
     @Override
     public ResponseEntity<List<Section>> getDeactivatedPendingSections() {
         try {
-            List<Section> deactivatedPendingSections = repository.findByActiveFalseAndStatus("PENDING");
+            // Get all sections for fallback if needed
+            List<Section> allSections = repository.findAll();
 
-            // Create audit trail for this query
-            UserAuditTrail audit = UserAuditTrail.builder()
-                    .userId("SYSTEM")
-                    .action("QUERY")
-                    .description("Retrieved " + deactivatedPendingSections.size() +
-                            " sections with deactivated status and PENDING approval")
-                    .doneBy("SYSTEM")
-                    .dateTime(LocalDateTime.now())
-                    .build();
-            mongoTemplate.save(audit, "section_audit_trail");
+            // Try the specific query - using the @Query method for better reliability
+            List<Section> deactivatedPendingSections;
+            try {
+                deactivatedPendingSections = repository.findDeactivatedSectionsByStatus("PENDING");
+                System.out.println("DEBUG: Found " + deactivatedPendingSections.size()
+                        + " deactivated pending sections using @Query");
+            } catch (Exception queryException) {
+                System.err.println("DEBUG: @Query method failed, trying alternative: " + queryException.getMessage());
+                // Fallback: Filter in memory as last resort
+                deactivatedPendingSections = allSections.stream()
+                        .filter(section -> !section.isActive() && "PENDING".equals(section.getStatus()))
+                        .toList();
+                System.out.println("DEBUG: Found " + deactivatedPendingSections.size()
+                        + " deactivated pending sections using in-memory filter");
+            }
+
+            // Create audit trail for this query (simplified to avoid potential issues)
+            try {
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId("SYSTEM")
+                        .action("QUERY")
+                        .description("Retrieved " + deactivatedPendingSections.size() +
+                                " sections with deactivated status and PENDING approval")
+                        .doneBy("SYSTEM")
+                        .dateTime(LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "section_audit_trail");
+                System.out.println("DEBUG: Audit trail saved successfully");
+            } catch (Exception auditException) {
+                System.err.println("DEBUG: Failed to save audit trail: " + auditException.getMessage());
+                // Continue without failing the main operation
+            }
 
             return ResponseEntity.ok(deactivatedPendingSections);
         } catch (Exception e) {
-            // Log error
-            UserAuditTrail errorAudit = UserAuditTrail.builder()
-                    .userId("SYSTEM")
-                    .action("ERROR")
-                    .description("Error retrieving deactivated pending sections: " + e.getMessage())
-                    .doneBy("SYSTEM")
-                    .dateTime(LocalDateTime.now())
-                    .build();
-            mongoTemplate.save(errorAudit, "section_audit_trail");
+            e.printStackTrace(); // Print full stack trace for debugging
+            System.err.println("DEBUG: Exception in getDeactivatedPendingSections: " + e.getMessage());
+
+            // Try to log error without causing another exception
+            try {
+                UserAuditTrail errorAudit = UserAuditTrail.builder()
+                        .userId("SYSTEM")
+                        .action("ERROR")
+                        .description("Error retrieving deactivated pending sections: " + e.getMessage())
+                        .doneBy("SYSTEM")
+                        .dateTime(LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(errorAudit, "section_audit_trail");
+            } catch (Exception auditException) {
+                System.err.println("DEBUG: Also failed to save error audit: " + auditException.getMessage());
+            }
 
             return ResponseEntity.status(500).body(null);
         }
