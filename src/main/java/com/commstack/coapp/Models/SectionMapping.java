@@ -24,6 +24,9 @@ public class SectionMapping {
 
     /** e.g. "collection" */
     private String type;
+    private String area;
+    private String country;
+    private String countryCoordinates;
 
     /** coordinates: list of polygons */
     private List<Polygon> coordinates;
