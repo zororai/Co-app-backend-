@@ -3,8 +3,11 @@ package com.commstack.coapp.Configs;
 import com.commstack.coapp.Repositories.UserService;
 import com.commstack.coapp.ServiceImplementation.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -28,36 +31,51 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@Order(2) // Run after BoundariesSecurityConfig
 public class SecurityConfiguration extends AbstractHttpConfigurer {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final BoundariesPublicAccessFilter boundariesPublicAccessFilter;
     private final UserService userService;
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.info("Configuring security filter chain");
+
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> request.requestMatchers(
-                        "/auth/signin",
-                        "/healthCheck",
-                        "/auth/reset-password",
-                        "/auth/forgot-password",
-                        "/version",
-                        "/auth/signup",
-                        "/api-docs",
-                        "/configuration/ui",
-                        "/swagger-resources/**",
-                        "/configuration/security",
-                        "/swagger-ui.html",
-                        "/webjars/**",
-                        "**/swagger-ui/**",
-                        "/api-docs/swagger-config",
-                        "/",
-                        "/#")
-                        .permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(request -> {
+                    log.info("Configuring authorization rules");
+                    request
+                            .requestMatchers(
+                                    "/auth/signin",
+                                    "/healthCheck",
+                                    "/auth/reset-password",
+                                    "/auth/forgot-password",
+                                    "/version",
+                                    "/auth/signup",
+                                    "/api-docs",
+                                    "/configuration/ui",
+                                    "/swagger-resources/**",
+                                    "/configuration/security",
+                                    "/swagger-ui.html",
+                                    "/webjars/**",
+                                    "**/swagger-ui/**",
+                                    "/api-docs/swagger-config",
+                                    "/",
+                                    "/#")
+                            .permitAll()
+                            .requestMatchers("/api/boundaries/**").permitAll()
+                            .requestMatchers("/api/area-names/**").permitAll()
+                            .anyRequest().authenticated();
+                })
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider()).addFilterBefore(
-                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider())
+                // Add our public endpoints filter before the JWT filter
+                .addFilterBefore(boundariesPublicAccessFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -79,7 +97,6 @@ public class SecurityConfiguration extends AbstractHttpConfigurer {
             throws Exception {
         return config.getAuthenticationManager();
     }
-
 
     // ✅ Add CORS config
     @Bean
