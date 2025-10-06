@@ -19,18 +19,21 @@ public class IncidentManagementServiceImpl implements IncidentManagementService 
 
     @Autowired
     private IncidentManagementRepository repository;
-    
+
     @Autowired
     private MongoTemplate mongoTemplate;
 
     @Override
     public ResponseEntity<IncidentManagement> create(IncidentManagement incident, Principal principal) {
+
+        incident.setStatus("investigating");
         IncidentManagement saved = repository.save(incident);
 
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(saved.getId())
                 .action("CREATED")
-                .description("Incident created: '" + saved.getIncidentTitle() + "' (Severity: '" + saved.getSeverityLevel() + "')")
+                .description("Incident created: '" + saved.getIncidentTitle() + "' (Severity: '"
+                        + saved.getSeverityLevel() + "')")
                 .doneBy(principal != null ? principal.getName() : "SYSTEM")
                 .dateTime(LocalDateTime.now())
                 .build();
@@ -70,7 +73,8 @@ public class IncidentManagementServiceImpl implements IncidentManagementService 
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(id)
                 .action("UPDATED")
-                .description("Incident updated: '" + updated.getIncidentTitle() + "' (Severity: '" + updated.getSeverityLevel() + "')")
+                .description("Incident updated: '" + updated.getIncidentTitle() + "' (Severity: '"
+                        + updated.getSeverityLevel() + "')")
                 .doneBy(principal != null ? principal.getName() : "SYSTEM")
                 .dateTime(LocalDateTime.now())
                 .build();
@@ -91,7 +95,8 @@ public class IncidentManagementServiceImpl implements IncidentManagementService 
         UserAuditTrail audit = UserAuditTrail.builder()
                 .userId(id)
                 .action("DELETED")
-                .description("Incident deleted: '" + incident.getIncidentTitle() + "' (Severity: '" + incident.getSeverityLevel() + "')")
+                .description("Incident deleted: '" + incident.getIncidentTitle() + "' (Severity: '"
+                        + incident.getSeverityLevel() + "')")
                 .doneBy(principal != null ? principal.getName() : "SYSTEM")
                 .dateTime(LocalDateTime.now())
                 .build();

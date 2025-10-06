@@ -329,4 +329,19 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
             return ResponseEntity.status(500).body("Error processing email request: " + e.getMessage());
         }
     }
+
+    public ResponseEntity<UserOnboarding> getByEmail(String email) {
+        try {
+            logger.info("Fetching UserOnboarding by email: {}", email);
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Optional<UserOnboarding> opt = repository.findById(email);
+            return opt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            logger.error("Error fetching user by email {}: {}", email, e.getMessage(), e);
+            return ResponseEntity.status(500).build();
+        }
+    }
 }

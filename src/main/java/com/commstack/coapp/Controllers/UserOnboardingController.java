@@ -1,7 +1,6 @@
 package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.UserOnboarding;
-import com.commstack.coapp.DTO.EmailRequest;
 import com.commstack.coapp.Service.UserOnboardingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +19,14 @@ public class UserOnboardingController {
     private final UserOnboardingService service;
 
     @PostMapping("/create")
-    public ResponseEntity<UserOnboarding> create(@RequestBody UserOnboarding user, Principal principal) {
+    public ResponseEntity<Object> create(@RequestBody UserOnboarding user, Principal principal) {
         ResponseEntity<String> response = service.create(user, principal);
         if (response.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.ok(user);
         } else {
-            return ResponseEntity.status(response.getStatusCode()).body(null);
+            // Forward the exact status and message from the service so callers see the
+            // reason (e.g. "User already exists.")
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         }
     }
 
@@ -86,6 +87,11 @@ public class UserOnboardingController {
         return service.getAllPushedBackUsers();
     }
 
+    @GetMapping("/by-email")
+    public ResponseEntity<UserOnboarding> getByEmail(@RequestParam String email) {
+        return service.getByEmail(email);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, Principal principal) {
         ResponseEntity<String> response = service.delete(id, principal);
@@ -96,13 +102,4 @@ public class UserOnboardingController {
         }
     }
 
-    @GetMapping("/email")
-    public ResponseEntity<String> getEmail(@RequestParam String email) {
-        return service.getEmailResponse(email);
-    }
-
-    @PostMapping("/email")
-    public ResponseEntity<String> getEmailFromBody(@RequestBody EmailRequest emailRequest) {
-        return service.getEmailResponse(emailRequest.getEmail());
-    }
 }

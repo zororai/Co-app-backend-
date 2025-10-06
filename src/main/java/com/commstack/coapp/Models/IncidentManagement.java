@@ -24,6 +24,7 @@ public class IncidentManagement {
     private String description;
     private List<String> attachments; // e.g., file paths or URLs
     private String location;
+    private String status;
 
     private List<Person> participants;
 

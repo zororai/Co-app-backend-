@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,72 +35,43 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final MongoTemplate mongoTemplate;
-    private final JavaMailSender emailSender;
     // private final HttpHeadersImpl httpHeaders;
 
     @Override
     public ResponseEntity<Object> signup(Signup request, Principal principal) {
 
-        try {
-            // Validate input
-            if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("Email is required");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // for (Roles role : request.getRole()){
+        // role.setAssignedBy(auth.getName());
+        // role.setAssignedAt(LocalDateTime.now(TimeZone.getTimeZone("GMT+02:00").toZoneId()));
+        // }
+
+        var user = UserEntity.builder().fullName(request.getFullName()).deleted(false).createdBy("zoror")
+                .userCreatedAt(LocalDateTime.now(TimeZone.getTimeZone("GMT+02:00").toZoneId()))
+                .email(request.getEmail()).password(passwordEncoder.encode(request.getPassword())).build();
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+
+            Query query1 = new Query();
+            query1.addCriteria(Criteria.where("email").is(request.getEmail()));
+            var user1 = mongoTemplate.findOne(query1, UserEntity.class);
+
+            if (user1 != null && user1.getDeleted()) {
+                user.setReinstatedBy(auth.getName());
+                user.setReinstateTime(LocalDateTime.now(TimeZone.getTimeZone("GMT+02:00").toZoneId()));
+                mongoTemplate.findAndReplace(query1, user, "users");
+                var jwt = jwtService.generateToken(user);
+
+                return ResponseEntity.status(200).body(JwtAuthenticationResponse.builder().token(jwt).build());
             }
-            if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("Password is required");
-            }
-            if (request.getFullName() == null || request.getFullName().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("Full name is required");
-            }
-
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String createdByUser = principal != null ? principal.getName() : "system";
-
-            // for (Roles role : request.getRole()){
-            // role.setAssignedBy(auth.getName());
-            // role.setAssignedAt(LocalDateTime.now(TimeZone.getTimeZone("GMT+02:00").toZoneId()));
-            // }
-
-            var user = UserEntity.builder()
-                    .fullName(request.getFullName())
-                    .deleted(false)
-                    .createdBy(createdByUser)
-                    .userCreatedAt(LocalDateTime.now(TimeZone.getTimeZone("GMT+02:00").toZoneId()))
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .build();
-
-            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-
-                Query query1 = new Query();
-                query1.addCriteria(Criteria.where("email").is(request.getEmail()));
-                var user1 = mongoTemplate.findOne(query1, UserEntity.class);
-
-                if (user1 != null && user1.getDeleted()) {
-                    user.setReinstatedBy(auth != null ? auth.getName() : createdByUser);
-                    user.setReinstateTime(LocalDateTime.now(TimeZone.getTimeZone("GMT+02:00").toZoneId()));
-                    mongoTemplate.findAndReplace(query1, user, "users");
-                    var jwt = jwtService.generateToken(user);
-
-                    return ResponseEntity.status(200).body(JwtAuthenticationResponse.builder().token(jwt).build());
-                }
-                return ResponseEntity.status(409).body("User already exists.");
-            }
-
-            userRepository.save(user);
-            var jwt = jwtService.generateToken(user);
-            var userUpdates = UserUpdates.builder()
-                    .description("User " + request.getEmail() + " was created.")
-                    .dateTime(LocalDateTime.now())
-                    .doneBy(createdByUser)
-                    .build();
-            mongoTemplate.save(userUpdates);
-
-            return ResponseEntity.status(200).body(JwtAuthenticationResponse.builder().token(jwt).build());
-
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error creating user: " + e.getMessage());
+            return ResponseEntity.status(401).body("User already exists.");
         }
+        userRepository.save(user);
+        var jwt = jwtService.generateToken(user);
+        var userUpdates = UserUpdates.builder().description("User " + request.getEmail() + " was created.")
+                .dateTime(LocalDateTime.now()).doneBy("zororai").build();
+        mongoTemplate.save(userUpdates);
+
+        return ResponseEntity.status(200).body(JwtAuthenticationResponse.builder().token(jwt).build());
     }
 
     @Override
@@ -163,7 +133,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             role.setAssignedAt(LocalDateTime.now(TimeZone.getTimeZone("GMT+02:00").toZoneId()));
         }
 
-        var oldRoles = mongoTemplate.findOne(query, UserEntity.class);
         Update update = new Update();
         update.set("role", roles);
         update.set("roleUpdatedBy", principal.getName());

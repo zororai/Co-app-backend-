@@ -258,16 +258,6 @@ public class SectionServiceImpl implements SectionService {
         if (existing.isPresent()) {
             Section section = existing.get();
 
-            // Check if section is already active
-            if (section.isActive()) {
-                return ResponseEntity.status(400).body("Section is already active");
-            }
-
-            // Check if section is approved before allowing activation
-            if (!"APPROVED".equals(section.getStatus())) {
-                return ResponseEntity.status(400).body("Section must be approved before it can be activated");
-            }
-
             boolean wasActive = section.isActive();
             section.setActive(true);
             section.setUpdatedBy(principal.getName());
@@ -323,6 +313,47 @@ public class SectionServiceImpl implements SectionService {
             return ResponseEntity.ok("Section deactivated successfully");
         }
         return ResponseEntity.status(404).body("Section not found");
+    }
+
+    /**
+     * Force-activate a section regardless of its status. This is a utility method
+     * that sets isActive = true for the section with the provided id and records
+     * an audit entry. Returns 404 if not found.
+     *
+     * Note: This method is not part of the service interface; add it there if you
+     * want to expose it through the controller or other callers.
+     */
+    public ResponseEntity<String> forceActivate(String id, Principal principal) {
+        String actor = (principal != null && principal.getName() != null) ? principal.getName() : "SYSTEM";
+        Optional<Section> existing = repository.findById(id);
+        if (existing.isEmpty()) {
+            return ResponseEntity.status(404).body("Section not found");
+        }
+
+        Section section = existing.get();
+        boolean wasActive = section.isActive();
+        if (!wasActive) {
+            section.setActive(true);
+            section.setUpdatedBy(actor);
+            section.setUpdatedAt(LocalDate.now());
+            repository.save(section);
+
+            try {
+                UserAuditTrail audit = UserAuditTrail.builder()
+                        .userId(id)
+                        .action("FORCE_ACTIVATED")
+                        .description("Section '" + section.getSectionName() + "' force-activated. Active: "
+                                + wasActive + " -> " + section.isActive())
+                        .doneBy(actor)
+                        .dateTime(LocalDateTime.now())
+                        .build();
+                mongoTemplate.save(audit, "section_audit_trail");
+            } catch (Exception ignore) {
+                // don't fail if audit write fails
+            }
+        }
+
+        return ResponseEntity.ok("Section set to active");
     }
 
     @Override

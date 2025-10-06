@@ -31,4 +31,6 @@ public interface UserOnboardingService {
     ResponseEntity<String> getAllPushedBackUsers();
 
     ResponseEntity<String> getEmailResponse(String email);
+
+    ResponseEntity<UserOnboarding> getByEmail(String email);
 }

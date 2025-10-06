@@ -25,50 +25,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserService userService;
 
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-
-    @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-
-        // Skip JWT filter for public endpoints
-        boolean shouldSkip = requestURI.startsWith("/api/boundaries") ||
-                requestURI.startsWith("/api/area-names");
-
-        if (shouldSkip) {
-            log.info("Skipping JWT filter for public endpoint: {}", requestURI);
-        }
-        return shouldSkip;
-    }
-
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException, java.io.IOException {
         final String authHeader = request.getHeader("Authorization");
-        final String requestURI = request.getRequestURI();
-
-        log.info("JWT filter processing: URI={}, Method={}, HasAuthHeader={}",
-                requestURI, request.getMethod(), (authHeader != null));
-
-        // Double check for public endpoints
-        if (requestURI.startsWith("/api/boundaries") || requestURI.startsWith("/api/area-names")) {
-            log.info("Public endpoint detected, skipping JWT authentication: {}", requestURI);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // If no auth header or not Bearer token, continue filter chain
+        final String jwt;
+        final String userEmail;
         if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, "Bearer ")) {
-            log.info("No valid Authorization header found, skipping JWT validation");
             filterChain.doFilter(request, response);
             return;
         }
-
-        // We can safely use substring here as we've verified authHeader is not null and
-        // starts with "Bearer "
-        final String jwt = authHeader.substring(7);
-        final String userEmail = jwtService.extractUserName(jwt);
+        jwt = authHeader.substring(7);
+        userEmail = jwtService.extractUserName(jwt);
         if (StringUtils.isNotEmpty(userEmail)
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userService.userDetailsService()

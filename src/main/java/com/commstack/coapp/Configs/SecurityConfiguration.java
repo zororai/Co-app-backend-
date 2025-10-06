@@ -55,9 +55,9 @@ public class SecurityConfiguration extends AbstractHttpConfigurer {
                         "/",
                         "/#")
                         .permitAll().anyRequest().authenticated())
-        .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-        .authenticationProvider(authenticationProvider())
-        .addFilter(jwtAuthenticationFilter);
+                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
+                .authenticationProvider(authenticationProvider());
+
         return http.build();
     }
 
