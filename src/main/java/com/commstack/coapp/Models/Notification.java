@@ -19,6 +19,7 @@ public class Notification {
     private String id;
 
     private String title;
+    private String type;
     private String message;
 
     // Simple audit fields
