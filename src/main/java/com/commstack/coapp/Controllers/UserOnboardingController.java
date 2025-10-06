@@ -88,7 +88,7 @@ public class UserOnboardingController {
     }
 
     @GetMapping("/by-email")
-    public ResponseEntity<UserOnboarding> getByEmail(@RequestParam String email) {
+    public ResponseEntity<?> getByEmail(@RequestParam String email) {
         return service.getByEmail(email);
     }
 

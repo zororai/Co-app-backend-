@@ -312,36 +312,22 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
     }
 
     @Override
-    public ResponseEntity<String> getEmailResponse(String email) {
+    public ResponseEntity<?> getByEmail(String email) {
         try {
-            logger.info("Received email request for: {}", email);
-
-            // Validate email input
             if (email == null || email.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("Email parameter is required");
+                return ResponseEntity.badRequest().body("Email is required");
             }
 
-            // Return the email
-            return ResponseEntity.ok(email);
-
-        } catch (Exception e) {
-            logger.error("Error processing email request: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body("Error processing email request: " + e.getMessage());
-        }
-    }
-
-    public ResponseEntity<UserOnboarding> getByEmail(String email) {
-        try {
-            logger.info("Fetching UserOnboarding by email: {}", email);
-            if (email == null || email.trim().isEmpty()) {
-                return ResponseEntity.badRequest().build();
+            Optional<UserOnboarding> userOpt = repository.findByEmail(email.trim());
+            if (userOpt.isPresent()) {
+                return ResponseEntity.ok(userOpt.get());
+            } else {
+                return ResponseEntity.status(404).body("User not found");
             }
-
-            Optional<UserOnboarding> opt = repository.findById(email);
-            return opt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         } catch (Exception e) {
             logger.error("Error fetching user by email {}: {}", email, e.getMessage(), e);
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body("Error fetching user: " + e.getMessage());
         }
     }
+
 }
