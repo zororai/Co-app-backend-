@@ -31,6 +31,11 @@ public class ShaftAssignment {
     private String status;
     private List<Loan> loans;
     private String reason;
+    // Location details: latitude and longitude for coordinate capture
+    private Double latitude;
+    private Double longitude;
+    // Optional human-friendly description of the location (e.g., address or
+    // landmark)
     private String createdBy;
     private double amountPaid;
     private double balance;

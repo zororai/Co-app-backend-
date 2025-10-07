@@ -102,8 +102,9 @@ public class ShaftAssignmentController {
     private final ShaftAssignmentService shaftAssignmentService;
 
     @PostMapping
-    public ResponseEntity<ShaftAssignment> create(@RequestBody ShaftAssignment shaftAssignment, Principal principal) {
-        return ResponseEntity.ok(shaftAssignmentService.create(shaftAssignment, principal));
+    public org.springframework.http.ResponseEntity<?> create(@RequestBody ShaftAssignment shaftAssignment,
+            Principal principal) {
+        return shaftAssignmentService.create(shaftAssignment, principal);
     }
 
     @GetMapping("/approved")

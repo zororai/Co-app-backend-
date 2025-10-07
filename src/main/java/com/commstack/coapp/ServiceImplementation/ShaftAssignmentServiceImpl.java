@@ -1,13 +1,9 @@
 
 package com.commstack.coapp.ServiceImplementation;
 
-import com.commstack.coapp.Repositories.SectionRepository;
-import com.commstack.coapp.Models.Section;
-
 import com.commstack.coapp.Repositories.CompanyRegistrationRepository;
 import com.commstack.coapp.Repositories.RegMinerRepository;
 import com.commstack.coapp.Models.Loan;
-import com.commstack.coapp.Models.Mill;
 import com.commstack.coapp.Models.Regminer;
 import com.commstack.coapp.Models.UserAuditTrail;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -21,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import com.commstack.coapp.Models.Loan;
 import java.util.List;
 import java.util.Optional;
 
@@ -221,7 +216,7 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
     }
 
     @Autowired
-    private SectionRepository sectionRepository;
+    private com.commstack.coapp.Repositories.SectionMappingRepository sectionMappingRepository;
 
     public ShaftAssignment pushBack(String id, String reason, Principal principal) {
         Optional<ShaftAssignment> result = repository.findById(id);
@@ -284,12 +279,55 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
     private ShaftAssignmentRepository repository;
 
     @Override
-    public ShaftAssignment create(ShaftAssignment shaftAssignment, Principal principal) {
+    public org.springframework.http.ResponseEntity<?> create(ShaftAssignment shaftAssignment, Principal principal) {
+        // Validate coordinates are present
+        Double lat = shaftAssignment.getLatitude();
+        Double lon = shaftAssignment.getLongitude();
+        if (lat == null || lon == null) {
+            return org.springframework.http.ResponseEntity.status(400)
+                    .body("Shaft location coordinates (latitude and longitude) are required");
+        }
+
+        // Find section mapping by sectionName
+        String sectionName = shaftAssignment.getSectionName();
+        if (sectionName == null || sectionName.trim().isEmpty()) {
+            return org.springframework.http.ResponseEntity.status(400)
+                    .body("Section name is required to validate coordinates");
+        }
+
+        var sectionMappingOpt = sectionMappingRepository.findByName(sectionName.trim());
+        if (sectionMappingOpt.isEmpty()) {
+            return org.springframework.http.ResponseEntity.status(404)
+                    .body("No section mapping found for section: " + sectionName);
+        }
+
+        var sectionMapping = sectionMappingOpt.get();
+
+        boolean insideAny = false;
+        if (sectionMapping.getCoordinates() != null) {
+            for (var polygon : sectionMapping.getCoordinates()) {
+                List<com.commstack.coapp.Models.SectionMapping.Point> points = polygon.getPoints();
+                if (points != null && !points.isEmpty()) {
+                    if (pointInPolygon(lat, lon, points)) {
+                        insideAny = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!insideAny) {
+            return org.springframework.http.ResponseEntity.status(400)
+                    .body("Provided coordinates are outside the mapped area for section: " + sectionName);
+        }
+
+        // proceed with original creation logic
         // Check if creating this shaft exceeds the allowed number in Section
         shaftAssignment.setCreatedBy(principal.getName());
         shaftAssignment.setCreatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setUpdatedBy(principal.getName());
         shaftAssignment.setAmountPaid(0);
+
         shaftAssignment.setBalance(0);
         shaftAssignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
         shaftAssignment.setStatus("PENDING"); // Assuming reason is not set during creation
@@ -352,7 +390,7 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
                 .dateTime(LocalDateTime.now())
                 .build();
         mongoTemplate.save(audit, "user_audit_trail");
-        return saved;
+        return org.springframework.http.ResponseEntity.ok(saved);
     }
 
     @Override
@@ -402,5 +440,32 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
                 .dateTime(LocalDateTime.now())
                 .build();
         mongoTemplate.save(audit, "user_audit_trail");
+    }
+
+    /**
+     * Ray-casting algorithm to determine if point (lat, lon) is inside polygon
+     * Points are expected as SectionMapping.Point with x (longitude) and y
+     * (latitude) or vice versa.
+     */
+    private boolean pointInPolygon(Double lat, Double lon,
+            List<com.commstack.coapp.Models.SectionMapping.Point> points) {
+        if (points == null || points.size() < 3 || lat == null || lon == null)
+            return false;
+
+        boolean inside = false;
+        int n = points.size();
+        for (int i = 0, j = n - 1; i < n; j = i++) {
+            double xi = points.get(i).getX();
+            double yi = points.get(i).getY();
+            double xj = points.get(j).getX();
+            double yj = points.get(j).getY();
+
+            // Assuming points.x == longitude, points.y == latitude
+            boolean intersect = ((yi > lat) != (yj > lat)) &&
+                    (lon < (xj - xi) * (lat - yi) / (yj - yi + 0.0) + xi);
+            if (intersect)
+                inside = !inside;
+        }
+        return inside;
     }
 }

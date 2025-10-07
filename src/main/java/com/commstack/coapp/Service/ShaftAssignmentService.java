@@ -6,7 +6,7 @@ import java.util.List;
 import java.security.Principal;
 
 public interface ShaftAssignmentService {
-    ShaftAssignment create(ShaftAssignment shaftAssignment, Principal principal);
+    org.springframework.http.ResponseEntity<?> create(ShaftAssignment shaftAssignment, Principal principal);
 
     ShaftAssignment getById(String id);
 
