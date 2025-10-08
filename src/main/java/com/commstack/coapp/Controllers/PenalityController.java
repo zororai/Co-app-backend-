@@ -2,6 +2,10 @@ package com.commstack.coapp.Controllers;
 
 import com.commstack.coapp.Models.Penality;
 import com.commstack.coapp.Service.PenalityService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/penalities")
+@SecurityRequirement(name = "Bearer Authentication")
 public class PenalityController {
 
     private final PenalityService penalityService;
@@ -37,7 +42,8 @@ public class PenalityController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Penality> update(@PathVariable String id, @RequestBody Penality penality, Principal principal) {
+    public ResponseEntity<Penality> update(@PathVariable String id, @RequestBody Penality penality,
+            Principal principal) {
         Penality updated = penalityService.update(id, penality, principal);
         return updated == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updated);
     }
@@ -53,7 +59,7 @@ public class PenalityController {
         return penalityService.findByShaftNumber(shaftNumber);
     }
 
-    @PostMapping("/{id}/mark-paid")
+    @PutMapping("/{id}/mark-paid")
     public ResponseEntity<Penality> markAsPaid(@PathVariable String id, Principal principal) {
         Penality p = penalityService.markAsPaid(id, principal);
         return p == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(p);
