@@ -17,4 +17,6 @@ public interface ShaftAssignmentService {
     ShaftAssignment update(String id, ShaftAssignment shaftAssignment, Principal principal);
 
     void delete(String id, Principal principal);
+
+    ShaftAssignment suspendForSHE(String id, String reason, Principal principal);
 }

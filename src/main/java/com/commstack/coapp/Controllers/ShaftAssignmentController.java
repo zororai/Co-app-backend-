@@ -161,4 +161,13 @@ public class ShaftAssignmentController {
                 .approve(id, principal);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/{id}/suspend-for-she")
+    public ResponseEntity<ShaftAssignment> suspendForSHE(@PathVariable String id,
+            @RequestParam String reason,
+            Principal principal) {
+        ShaftAssignment updated = ((com.commstack.coapp.ServiceImplementation.ShaftAssignmentServiceImpl) shaftAssignmentService)
+                .suspendForSHE(id, reason, principal);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
 }

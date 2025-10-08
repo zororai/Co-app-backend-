@@ -269,6 +269,29 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
         return null;
     }
 
+    public ShaftAssignment suspendForSHE(String id, String reason, Principal principal) {
+        Optional<ShaftAssignment> result = repository.findById(id);
+        if (result.isPresent()) {
+            ShaftAssignment assignment = result.get();
+            assignment.setStatus("SUSPENDED");
+            assignment.setReason(reason);
+            assignment.setUpdatedBy(principal.getName());
+            assignment.setUpdatedAt(LocalDateTime.now().toLocalDate());
+            ShaftAssignment updated = repository.save(assignment);
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(id)
+                    .action("SUSPENDED_FOR_SHE")
+                    .description(
+                            "Suspended shaft assignment for minerId: " + updated.getMinerId() + ", reason: " + reason)
+                    .doneBy(principal.getName())
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "user_audit_trail");
+            return updated;
+        }
+        return null;
+    }
+
     @Autowired
     private RegMinerRepository regMinerRepository;
     @Autowired
