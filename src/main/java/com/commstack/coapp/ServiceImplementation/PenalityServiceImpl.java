@@ -137,4 +137,32 @@ public class PenalityServiceImpl implements PenalityService {
     public List<Penality> findByShaftNumber(String shaftNumber) {
         return penalityRepository.findByShaftNumber(shaftNumber);
     }
+
+    @Override
+    public Penality markAsPaid(String id, Principal principal) {
+        Optional<Penality> opt = penalityRepository.findById(id);
+        if (!opt.isPresent()) return null;
+        Penality existing = opt.get();
+        String user = principal != null ? principal.getName() : "system";
+        String oldStatus = existing.getStatus();
+        existing.setStatus("Paid");
+        existing.setUpdatedBy(user);
+        existing.setUpdatedAt(LocalDateTime.now());
+        Penality saved = penalityRepository.save(existing);
+
+        try {
+            UserAuditTrail audit = UserAuditTrail.builder()
+                    .userId(saved.getId())
+                    .action("MARK_PENALITY_PAID")
+                    .description("Status changed from " + oldStatus + " to Paid for shaft " + saved.getShaftNumber())
+                    .doneBy(user)
+                    .dateTime(LocalDateTime.now())
+                    .build();
+            mongoTemplate.save(audit, "penality_audit_trail");
+        } catch (Exception e) {
+            System.err.println("Failed to write penality mark-as-paid audit: " + e.getMessage());
+        }
+
+        return saved;
+    }
 }

@@ -52,4 +52,10 @@ public class PenalityController {
     public List<Penality> findByShaft(@PathVariable String shaftNumber) {
         return penalityService.findByShaftNumber(shaftNumber);
     }
+
+    @PostMapping("/{id}/mark-paid")
+    public ResponseEntity<Penality> markAsPaid(@PathVariable String id, Principal principal) {
+        Penality p = penalityService.markAsPaid(id, principal);
+        return p == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(p);
+    }
 }

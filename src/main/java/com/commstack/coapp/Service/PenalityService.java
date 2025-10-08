@@ -13,4 +13,5 @@ public interface PenalityService {
     Penality update(String id, Penality penality, Principal principal);
     void delete(String id);
     List<Penality> findByShaftNumber(String shaftNumber);
+    Penality markAsPaid(String id, Principal principal);
 }
