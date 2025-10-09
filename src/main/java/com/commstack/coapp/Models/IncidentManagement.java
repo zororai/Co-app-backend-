@@ -22,6 +22,7 @@ public class IncidentManagement {
     private String severityLevel;
     private String reportedBy;
     private String description;
+    private String resolution; // e.g., "theft", "vandalism", etc.
     private List<String> attachments; // e.g., file paths or URLs
     private String location;
     private String status;

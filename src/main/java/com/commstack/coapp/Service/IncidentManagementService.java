@@ -16,4 +16,6 @@ public interface IncidentManagementService {
     ResponseEntity<IncidentManagement> update(String id, IncidentManagement incident, Principal principal);
 
     ResponseEntity<String> delete(String id, Principal principal);
+
+    ResponseEntity<IncidentManagement> resolve(String id, String resolution, Principal principal);
 }

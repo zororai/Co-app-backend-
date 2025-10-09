@@ -35,13 +35,20 @@ public class IncidentManagementController {
 
     @PutMapping("/{id}")
     public ResponseEntity<IncidentManagement> update(@PathVariable String id,
-                                                     @RequestBody IncidentManagement incident,
-                                                     Principal principal) {
+            @RequestBody IncidentManagement incident,
+            Principal principal) {
         return service.update(id, incident, principal);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable String id, Principal principal) {
         return service.delete(id, principal);
+    }
+
+    @PutMapping("/{id}/resolve")
+    public ResponseEntity<IncidentManagement> resolve(@PathVariable String id,
+            @RequestParam String resolution,
+            Principal principal) {
+        return service.resolve(id, resolution, principal);
     }
 }

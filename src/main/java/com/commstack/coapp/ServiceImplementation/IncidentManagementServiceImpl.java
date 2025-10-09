@@ -27,6 +27,7 @@ public class IncidentManagementServiceImpl implements IncidentManagementService 
     public ResponseEntity<IncidentManagement> create(IncidentManagement incident, Principal principal) {
 
         incident.setStatus("investigating");
+        incident.setResolution("under review");
         IncidentManagement saved = repository.save(incident);
 
         UserAuditTrail audit = UserAuditTrail.builder()
@@ -104,5 +105,34 @@ public class IncidentManagementServiceImpl implements IncidentManagementService 
 
         repository.deleteById(id);
         return ResponseEntity.ok("Incident deleted successfully");
+    }
+
+    @Override
+    public ResponseEntity<IncidentManagement> resolve(String id, String resolution, Principal principal) {
+        Optional<IncidentManagement> existingOpt = repository.findById(id);
+        if (existingOpt.isEmpty()) {
+            return ResponseEntity.status(404).build();
+        }
+
+        IncidentManagement existing = existingOpt.get();
+        existing.setStatus("Resolved");
+        existing.setResolution(resolution);
+        // optional: track who resolved
+        // existing.setUpdatedBy(principal != null ? principal.getName() : "SYSTEM");
+        // existing.setUpdatedAt(LocalDateTime.now());
+
+        IncidentManagement updated = repository.save(existing);
+
+        UserAuditTrail audit = UserAuditTrail.builder()
+                .userId(id)
+                .action("RESOLVED")
+                .description(
+                        "Incident resolved: '" + updated.getIncidentTitle() + "' -> Resolution: '" + resolution + "'")
+                .doneBy(principal != null ? principal.getName() : "SYSTEM")
+                .dateTime(LocalDateTime.now())
+                .build();
+        mongoTemplate.save(audit, "incident_audit_trail");
+
+        return ResponseEntity.ok(updated);
     }
 }

@@ -30,21 +30,4 @@ public class Penality {
     private LocalDateTime createdAt;
     private String updatedBy;
     private LocalDateTime updatedAt;
-
-    // explicit getters/setters for fields that may be referenced without Lombok processing
-    public String getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getRemarks() {
-        return this.remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
 }
