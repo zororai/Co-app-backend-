@@ -80,6 +80,20 @@ public class OreTransportController {
         return service.getById(id);
     }
 
+    @GetMapping("/monthly-totals")
+    public ResponseEntity<java.util.List<com.commstack.coapp.DTO.MonthlyTotalsDTO>> getMonthlyTotals(
+            @RequestParam int year) {
+        java.util.List<com.commstack.coapp.DTO.MonthlyTotalsDTO> totals = service.getMonthlyTotals(year);
+        return ResponseEntity.ok(totals);
+    }
+
+    @GetMapping("/monthly-gold-sales")
+    public ResponseEntity<java.util.List<com.commstack.coapp.DTO.MonthlyGoldSalesDTO>> getMonthlyGoldSales(
+            @RequestParam int year) {
+        java.util.List<com.commstack.coapp.DTO.MonthlyGoldSalesDTO> totals = service.getMonthlyGoldSales(year);
+        return ResponseEntity.ok(totals);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable String id, @RequestBody OreTransport oreTransport,
             Principal principal) {

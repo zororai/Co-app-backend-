@@ -49,4 +49,10 @@ public interface OreTransportService {
         ResponseEntity<OreTransport> collectSample(String oreTransportId, String sampleType,
                         String sampleWeight, String status, String sampleSize);
 
+        com.commstack.coapp.DTO.MonthlyTotalsDTO getMonthlyTotals(int year, int month);
+
+        java.util.List<com.commstack.coapp.DTO.MonthlyTotalsDTO> getMonthlyTotals(int year);
+
+        java.util.List<com.commstack.coapp.DTO.MonthlyGoldSalesDTO> getMonthlyGoldSales(int year);
+
 }

@@ -1,19 +1,14 @@
 
 package com.commstack.coapp.ServiceImplementation;
 
-import com.commstack.coapp.Models.CompanyRegistration;
 import com.commstack.coapp.Models.GoldSale;
 import com.commstack.coapp.Models.Mill;
-import com.commstack.coapp.Models.MinerAuditTrail;
 import com.commstack.coapp.Models.OreSample;
 import com.commstack.coapp.Models.OreTransport;
 import com.commstack.coapp.Models.OreTransportAuditTrail;
-import com.commstack.coapp.Models.Regminer;
 import com.commstack.coapp.Models.TransportCost;
 import com.commstack.coapp.Repositories.OreTransportRepository;
 import com.commstack.coapp.Service.OreTransportService;
-
-import jakarta.mail.Transport;
 
 import com.commstack.coapp.Models.UserAuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -341,6 +335,82 @@ public class OreTransportServiceImpl implements OreTransportService {
                 .toList();
     }
 
+    @Override
+    public com.commstack.coapp.DTO.MonthlyTotalsDTO getMonthlyTotals(int year, int month) {
+        List<OreTransport> all = repository.findAll();
+        double totalWeight = 0.0;
+        double totalNewWeight = 0.0;
+        for (OreTransport ot : all) {
+            if (ot.getCreatedDate() != null) {
+                LocalDateTime dt = ot.getCreatedDate();
+                if (dt.getYear() == year && dt.getMonthValue() == month) {
+                    totalWeight += ot.getWeight();
+                    totalNewWeight += ot.getNewWeight();
+                }
+            }
+        }
+        return new com.commstack.coapp.DTO.MonthlyTotalsDTO(year, month, totalWeight, totalNewWeight);
+    }
+
+    @Override
+    public java.util.List<com.commstack.coapp.DTO.MonthlyTotalsDTO> getMonthlyTotals(int year) {
+        List<OreTransport> all = repository.findAll();
+        java.util.Map<Integer, double[]> map = new java.util.HashMap<>();
+        // initialize months 1..12
+        for (int m = 1; m <= 12; m++) {
+            map.put(m, new double[] { 0.0, 0.0 });
+        }
+        for (OreTransport ot : all) {
+            if (ot.getCreatedDate() != null) {
+                LocalDateTime dt = ot.getCreatedDate();
+                if (dt.getYear() == year) {
+                    int m = dt.getMonthValue();
+                    double[] acc = map.getOrDefault(m, new double[] { 0.0, 0.0 });
+                    acc[0] += ot.getWeight();
+                    acc[1] += ot.getNewWeight();
+                    map.put(m, acc);
+                }
+            }
+        }
+        java.util.List<com.commstack.coapp.DTO.MonthlyTotalsDTO> result = new java.util.ArrayList<>();
+        for (int m = 1; m <= 12; m++) {
+            double[] acc = map.get(m);
+            result.add(new com.commstack.coapp.DTO.MonthlyTotalsDTO(year, m, acc[0], acc[1]));
+        }
+        return result;
+    }
+
+    @Override
+    public java.util.List<com.commstack.coapp.DTO.MonthlyGoldSalesDTO> getMonthlyGoldSales(int year) {
+        List<OreTransport> all = repository.findAll();
+        java.util.Map<Integer, double[]> map = new java.util.HashMap<>();
+        for (int m = 1; m <= 12; m++) {
+            map.put(m, new double[] { 0.0, 0.0 }); // [weightSum, priceSum]
+        }
+        for (OreTransport ot : all) {
+            if (ot.getCreatedDate() != null && ot.getGoldSales() != null) {
+                LocalDateTime dt = ot.getCreatedDate();
+                if (dt.getYear() == year) {
+                    int m = dt.getMonthValue();
+                    double[] acc = map.getOrDefault(m, new double[] { 0.0, 0.0 });
+                    for (GoldSale gs : ot.getGoldSales()) {
+                        if (gs != null) {
+                            acc[0] += gs.getWeight();
+                            acc[1] += gs.getPrice();
+                        }
+                    }
+                    map.put(m, acc);
+                }
+            }
+        }
+        java.util.List<com.commstack.coapp.DTO.MonthlyGoldSalesDTO> result = new java.util.ArrayList<>();
+        for (int m = 1; m <= 12; m++) {
+            double[] acc = map.get(m);
+            result.add(new com.commstack.coapp.DTO.MonthlyGoldSalesDTO(year, m, acc[0], acc[1]));
+        }
+        return result;
+    }
+
     public ResponseEntity<String> updateTransportFields(String id, String selectedTransportdriver,
             String transportStatus, String selectedTransport, String transportReason, String location,
             Principal principal) {
@@ -398,6 +468,8 @@ public class OreTransportServiceImpl implements OreTransportService {
                 .location(oreTransportDTO.getLocation())
                 .build();
         oreTransport.setId(generateRegistrationNumber());
+        // set createdDate for new record
+        oreTransport.setCreatedDate(LocalDateTime.now());
         oreTransportDTO.setDedicationReason("Not specified");
         oreTransport.setNewnumberOfBags(0);
         oreTransport.setNewWeight(0);
