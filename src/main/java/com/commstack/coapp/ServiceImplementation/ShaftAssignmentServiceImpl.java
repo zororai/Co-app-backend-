@@ -417,6 +417,14 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
     }
 
     @Override
+    public com.commstack.coapp.DTO.ShaftStatusCountsDTO getSuspendedAndApprovedCounts() {
+        List<ShaftAssignment> all = repository.findAll();
+        long suspended = all.stream().filter(s -> "SUSPENDED".equalsIgnoreCase(s.getStatus())).count();
+        long approved = all.stream().filter(s -> "APPROVED".equalsIgnoreCase(s.getStatus())).count();
+        return new com.commstack.coapp.DTO.ShaftStatusCountsDTO(suspended, approved);
+    }
+
+    @Override
     public ShaftAssignment getById(String id) {
         Optional<ShaftAssignment> result = repository.findById(id);
         return result.orElse(null);

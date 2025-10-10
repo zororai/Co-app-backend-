@@ -19,4 +19,6 @@ public interface ShaftAssignmentService {
     void delete(String id, Principal principal);
 
     ShaftAssignment suspendForSHE(String id, String reason, Principal principal);
+
+    com.commstack.coapp.DTO.ShaftStatusCountsDTO getSuspendedAndApprovedCounts();
 }

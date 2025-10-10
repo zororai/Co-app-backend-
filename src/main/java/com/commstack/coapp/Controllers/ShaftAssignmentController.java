@@ -170,4 +170,10 @@ public class ShaftAssignmentController {
                 .suspendForSHE(id, reason, principal);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/status-counts")
+    public ResponseEntity<com.commstack.coapp.DTO.ShaftStatusCountsDTO> getStatusCounts() {
+        com.commstack.coapp.DTO.ShaftStatusCountsDTO counts = shaftAssignmentService.getSuspendedAndApprovedCounts();
+        return ResponseEntity.ok(counts);
+    }
 }
