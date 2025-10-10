@@ -33,4 +33,6 @@ public interface SecurityCompanyService {
     SecurityCompany findByEmailAddress(String emailAddress);
 
     SecurityCompany findByBpNumber(String bpNumber);
+
+    long getApprovedCompanyCount();
 }

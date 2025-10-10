@@ -12,4 +12,6 @@ public interface SecurityCompanyRepository extends MongoRepository<SecurityCompa
     SecurityCompany findByContactEmail(String contactEmail);
 
     SecurityCompany findByRegistrationNumber(String registrationNumber);
+
+    long countByStatusIgnoreCase(String status);
 }

@@ -203,6 +203,11 @@ public class RegMinerServiceImpl implements RegMinerService {
     }
 
     @Override
+    public long getApprovedMinerCount() {
+        return repository.countByStatusIgnoreCase("APPROVED");
+    }
+
+    @Override
     public Regminer getById(String id) {
         return repository.findById(id).orElse(null);
     }

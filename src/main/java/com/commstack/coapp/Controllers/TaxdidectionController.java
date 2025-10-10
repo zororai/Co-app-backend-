@@ -73,7 +73,7 @@ public class TaxdidectionController {
     }
 
     @PutMapping("/{id}/pushback")
-    public ResponseEntity pushBack(@PathVariable String id, @RequestParam String reason, Principal principal) {
+    public ResponseEntity<?> pushBack(@PathVariable String id, @RequestParam String reason, Principal principal) {
         return service.pushBack(id, reason, principal);
     }
 }

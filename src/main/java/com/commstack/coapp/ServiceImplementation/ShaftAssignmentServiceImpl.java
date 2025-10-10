@@ -425,6 +425,11 @@ public class ShaftAssignmentServiceImpl implements ShaftAssignmentService {
     }
 
     @Override
+    public long getApprovedShaftAssignmentCount() {
+        return repository.countByStatusIgnoreCase("APPROVED");
+    }
+
+    @Override
     public ShaftAssignment getById(String id) {
         Optional<ShaftAssignment> result = repository.findById(id);
         return result.orElse(null);

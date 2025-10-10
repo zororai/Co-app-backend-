@@ -176,4 +176,10 @@ public class ShaftAssignmentController {
         com.commstack.coapp.DTO.ShaftStatusCountsDTO counts = shaftAssignmentService.getSuspendedAndApprovedCounts();
         return ResponseEntity.ok(counts);
     }
+
+    @GetMapping("/approved-count")
+    public ResponseEntity<Long> getApprovedCount() {
+        long count = shaftAssignmentService.getApprovedShaftAssignmentCount();
+        return ResponseEntity.ok(count);
+    }
 }

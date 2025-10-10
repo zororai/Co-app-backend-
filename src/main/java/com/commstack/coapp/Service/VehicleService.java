@@ -47,4 +47,6 @@ public interface VehicleService {
     List<Vehicle> findByOwnerName(String ownerName);
 
     Vehicle findByOwnerIdNumber(String ownerIdNumber);
+
+    long getApprovedVehicleCount();
 }

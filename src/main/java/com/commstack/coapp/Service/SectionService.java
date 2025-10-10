@@ -28,13 +28,13 @@ public interface SectionService {
 
     List<Section> findByNumberOfShaft(String numberOfShaft);
 
-    ResponseEntity<String> getAllPendingSections();
+    ResponseEntity<List<Section>> getAllPendingSections();
 
-    ResponseEntity<String> getAllApprovedSections();
+    ResponseEntity<List<Section>> getAllApprovedSections();
 
-    ResponseEntity<String> getAllRejectedSections();
+    ResponseEntity<List<Section>> getAllRejectedSections();
 
-    ResponseEntity<String> getAllPushedBackSections();
+    ResponseEntity<List<Section>> getAllPushedBackSections();
 
     ResponseEntity<String> activateSection(String id, Principal principal);
 

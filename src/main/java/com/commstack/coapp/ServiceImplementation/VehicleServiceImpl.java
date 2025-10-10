@@ -329,26 +329,31 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public ResponseEntity getAllPendingVehicles() {
+    public ResponseEntity<String> getAllPendingVehicles() {
         List<Vehicle> vehicles = repository.findByStatus("PENDING");
-        return ResponseEntity.ok(vehicles);
+        return ResponseEntity.ok(vehicles.toString());
     }
 
     @Override
-    public ResponseEntity getAllApprovedVehicles() {
+    public ResponseEntity<String> getAllApprovedVehicles() {
         List<Vehicle> vehicles = repository.findByStatus("APPROVED");
-        return ResponseEntity.ok(vehicles);
+        return ResponseEntity.ok(vehicles.toString());
     }
 
     @Override
-    public ResponseEntity getAllRejectedVehicles() {
+    public ResponseEntity<String> getAllRejectedVehicles() {
         List<Vehicle> vehicles = repository.findByStatus("REJECTED");
-        return ResponseEntity.ok(vehicles);
+        return ResponseEntity.ok(vehicles.toString());
     }
 
     @Override
-    public ResponseEntity getAllPushedBackVehicles() {
+    public ResponseEntity<String> getAllPushedBackVehicles() {
         List<Vehicle> vehicles = repository.findByStatus("PUSHED_BACK");
-        return ResponseEntity.ok(vehicles);
+        return ResponseEntity.ok(vehicles.toString());
+    }
+
+    @Override
+    public long getApprovedVehicleCount() {
+        return repository.countByStatusIgnoreCase("APPROVED");
     }
 }

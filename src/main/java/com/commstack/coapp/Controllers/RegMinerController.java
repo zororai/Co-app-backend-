@@ -6,7 +6,6 @@ import com.commstack.coapp.Service.RegMinerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,6 +89,12 @@ public class RegMinerController {
     @GetMapping("/getall")
     public ResponseEntity<List<Regminer>> getAllMiners() {
         return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping("/approved-count")
+    public ResponseEntity<Long> getApprovedMinerCount() {
+        long count = service.getApprovedMinerCount();
+        return ResponseEntity.ok(count);
     }
 
     @DeleteMapping("/{id}")

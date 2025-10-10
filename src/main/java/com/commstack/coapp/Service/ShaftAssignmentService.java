@@ -21,4 +21,6 @@ public interface ShaftAssignmentService {
     ShaftAssignment suspendForSHE(String id, String reason, Principal principal);
 
     com.commstack.coapp.DTO.ShaftStatusCountsDTO getSuspendedAndApprovedCounts();
+
+    long getApprovedShaftAssignmentCount();
 }

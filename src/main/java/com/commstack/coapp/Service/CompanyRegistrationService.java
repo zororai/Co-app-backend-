@@ -22,11 +22,11 @@ public interface CompanyRegistrationService {
 
     ResponseEntity<String> pushBack(String id, String reason, Principal principal);
 
-    ResponseEntity<String> getAllPendingCompanies();
+    ResponseEntity<List<CompanyRegistration>> getAllPendingCompanies();
 
-    ResponseEntity<String> getAllApprovedCompanies();
+    ResponseEntity<List<CompanyRegistration>> getAllApprovedCompanies();
 
-    ResponseEntity<String> getAllRejectedCompanies();
+    ResponseEntity<List<CompanyRegistration>> getAllRejectedCompanies();
 
-    ResponseEntity<String> getAllPushedBackCompanies();
+    ResponseEntity<List<CompanyRegistration>> getAllPushedBackCompanies();
 }

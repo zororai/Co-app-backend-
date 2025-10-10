@@ -6,7 +6,6 @@ import com.commstack.coapp.Service.SecurityCompanyService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
@@ -81,5 +80,11 @@ public class SecurityCompanyController {
     @GetMapping("/status/pushedback")
     public ResponseEntity<String> getPushedBackCompanies() {
         return service.getAllPushedBackCompanies();
+    }
+
+    @GetMapping("/status/approved-count")
+    public ResponseEntity<Long> getApprovedCompanyCount() {
+        long count = service.getApprovedCompanyCount();
+        return ResponseEntity.ok(count);
     }
 }

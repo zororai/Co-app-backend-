@@ -222,25 +222,25 @@ public class CompanyRegistrationServiceImpl implements CompanyRegistrationServic
     }
 
     @Override
-    public ResponseEntity getAllPendingCompanies() {
+    public ResponseEntity<List<CompanyRegistration>> getAllPendingCompanies() {
         List<CompanyRegistration> companies = repository.findByStatus("PENDING");
         return ResponseEntity.ok(companies);
     }
 
     @Override
-    public ResponseEntity getAllApprovedCompanies() {
+    public ResponseEntity<List<CompanyRegistration>> getAllApprovedCompanies() {
         List<CompanyRegistration> companies = repository.findByStatus("APPROVED");
         return ResponseEntity.ok(companies);
     }
 
     @Override
-    public ResponseEntity getAllRejectedCompanies() {
+    public ResponseEntity<List<CompanyRegistration>> getAllRejectedCompanies() {
         List<CompanyRegistration> companies = repository.findByStatus("REJECTED");
         return ResponseEntity.ok(companies);
     }
 
     @Override
-    public ResponseEntity getAllPushedBackCompanies() {
+    public ResponseEntity<List<CompanyRegistration>> getAllPushedBackCompanies() {
         List<CompanyRegistration> companies = repository.findByStatus("PUSHED_BACK");
         return ResponseEntity.ok(companies);
     }

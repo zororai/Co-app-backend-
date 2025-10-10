@@ -271,4 +271,9 @@ public class SecurityCompanyServiceImpl implements SecurityCompanyService {
         List<SecurityCompany> companies = repository.findByStatus("PUSHED_BACK");
         return ResponseEntity.ok(companies.toString());
     }
+
+    @Override
+    public long getApprovedCompanyCount() {
+        return repository.countByStatusIgnoreCase("APPROVED");
+    }
 }

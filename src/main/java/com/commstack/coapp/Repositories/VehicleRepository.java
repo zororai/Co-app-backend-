@@ -9,6 +9,8 @@ import java.util.List;
 public interface VehicleRepository extends MongoRepository<Vehicle, String> {
     List<Vehicle> findByStatus(String status);
 
+    long countByStatusIgnoreCase(String status);
+
     Vehicle findByRegNumber(String regNumber);
 
     List<Vehicle> findByOwnerName(String ownerName);

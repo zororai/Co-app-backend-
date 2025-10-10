@@ -229,25 +229,25 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    public ResponseEntity getAllPendingSections() {
+    public ResponseEntity<List<Section>> getAllPendingSections() {
         List<Section> sections = repository.findByStatus("PENDING");
         return ResponseEntity.ok(sections);
     }
 
     @Override
-    public ResponseEntity getAllApprovedSections() {
+    public ResponseEntity<List<Section>> getAllApprovedSections() {
         List<Section> sections = repository.findByStatus("APPROVED");
         return ResponseEntity.ok(sections);
     }
 
     @Override
-    public ResponseEntity getAllRejectedSections() {
+    public ResponseEntity<List<Section>> getAllRejectedSections() {
         List<Section> sections = repository.findByStatus("REJECTED");
         return ResponseEntity.ok(sections);
     }
 
     @Override
-    public ResponseEntity getAllPushedBackSections() {
+    public ResponseEntity<List<Section>> getAllPushedBackSections() {
         List<Section> sections = repository.findByStatus("PUSHED_BACK");
         return ResponseEntity.ok(sections);
     }

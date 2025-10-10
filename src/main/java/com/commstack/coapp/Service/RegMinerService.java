@@ -32,6 +32,6 @@ public interface RegMinerService {
 
     ResponseEntity<String> reject(String id, String reason, Principal principal);
 
-    ;
+    long getApprovedMinerCount();
 
 }

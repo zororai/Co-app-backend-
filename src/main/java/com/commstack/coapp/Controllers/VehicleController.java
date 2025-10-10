@@ -6,7 +6,7 @@ import com.commstack.coapp.Service.VehicleService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+// ...existing imports...
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
@@ -34,7 +34,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}/maintainance")
-    public ResponseEntity setVehicleToMaintainance(@PathVariable String id, Principal principal) {
+    public ResponseEntity<String> setVehicleToMaintainance(@PathVariable String id, Principal principal) {
         return service.setToMaintainance(id, principal);
     }
 
@@ -106,5 +106,11 @@ public class VehicleController {
     @GetMapping("/status/pushedback")
     public ResponseEntity<String> getPushedBackVehicles() {
         return service.getAllPushedBackVehicles();
+    }
+
+    @GetMapping("/status/approved-count")
+    public ResponseEntity<Long> getApprovedVehicleCount() {
+        long count = service.getApprovedVehicleCount();
+        return ResponseEntity.ok(count);
     }
 }

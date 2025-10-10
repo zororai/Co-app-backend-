@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ShaftAssignmentRepository extends MongoRepository<ShaftAssignment, String> {
     ShaftAssignment findByShaftNumbers(String shaftNumbers);
+
+    long countByStatusIgnoreCase(String status);
 }
