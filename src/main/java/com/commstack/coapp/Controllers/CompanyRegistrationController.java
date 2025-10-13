@@ -64,22 +64,22 @@ public class CompanyRegistrationController {
     }
 
     @GetMapping("/status/pending")
-    public ResponseEntity<String> getPendingCompanies() {
+    public ResponseEntity<List<CompanyRegistration>> getPendingCompanies() {
         return service.getAllPendingCompanies();
     }
 
     @GetMapping("/status/approved")
-    public ResponseEntity<String> getApprovedCompanies() {
+    public ResponseEntity<List<CompanyRegistration>> getApprovedCompanies() {
         return service.getAllApprovedCompanies();
     }
 
     @GetMapping("/status/rejected")
-    public ResponseEntity<String> getRejectedCompanies() {
+    public ResponseEntity<List<CompanyRegistration>> getRejectedCompanies() {
         return service.getAllRejectedCompanies();
     }
 
     @GetMapping("/status/pushedback")
-    public ResponseEntity<String> getPushedBackCompanies() {
+    public ResponseEntity<List<CompanyRegistration>> getPushedBackCompanies() {
         return service.getAllPushedBackCompanies();
     }
 }

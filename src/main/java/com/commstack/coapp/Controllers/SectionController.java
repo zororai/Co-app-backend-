@@ -63,22 +63,22 @@ public class SectionController {
     }
 
     @GetMapping("/status/pending")
-    public ResponseEntity<String> getPendingSections() {
+    public ResponseEntity<List<Section>> getPendingSections() {
         return service.getAllPendingSections();
     }
 
     @GetMapping("/status/approved")
-    public ResponseEntity<String> getApprovedSections() {
+    public ResponseEntity<List<Section>> getApprovedSections() {
         return service.getAllApprovedSections();
     }
 
     @GetMapping("/status/rejected")
-    public ResponseEntity<String> getRejectedSections() {
+    public ResponseEntity<List<Section>> getRejectedSections() {
         return service.getAllRejectedSections();
     }
 
     @GetMapping("/status/pushedback")
-    public ResponseEntity<String> getPushedBackSections() {
+    public ResponseEntity<List<Section>> getPushedBackSections() {
         return service.getAllPushedBackSections();
     }
 
